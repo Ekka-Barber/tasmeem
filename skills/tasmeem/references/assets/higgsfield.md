@@ -34,6 +34,7 @@ Run `higgsfield model list --image` and `higgsfield model get <id>` for the curr
 | Upscaling a photo (never one with text) | `topaz_image` | see `model get` |
 
 **Routing.**
+- **Comps are references,** so generate them at 1k and `medium` quality: 0.5 credits each, against 2.75 for a 2k high plate. Only plates that ship get 2k and `high`.
 - The default is `gpt_image_2_5`, at 2k resolution and `high` quality, which follows specifications literally.
 - Use `nano_banana_pro` when the brief is a mood or rests on reference images.
 - Use `recraft_v4_1` in vector mode for icons and patterns that must stay consistent and scalable.

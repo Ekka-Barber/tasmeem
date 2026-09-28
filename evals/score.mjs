@@ -2,8 +2,10 @@
 // Score every eval run with tasmeem's own checks and capture first-screen screenshots for the README.
 // Usage: node evals/score.mjs [--from <dir with playwright>]
 import { readdirSync, existsSync, writeFileSync, mkdirSync } from 'node:fs'
-import { join, dirname, resolve } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { join, dirname, resolve, normalize, extname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { createServer } from 'node:http'
+import { readFile } from 'node:fs/promises'
 import { scanFiles } from '../skills/tasmeem/scripts/lib/scan.mjs'
 import { collectFiles, totals } from '../skills/tasmeem/scripts/lib/util.mjs'
 import { checkRender, loadPlaywright } from '../skills/tasmeem/scripts/lib/render.mjs'
@@ -24,11 +26,14 @@ for (const brief of existsSync(runs) ? readdirSync(runs) : []) {
     const page = join(dir, 'index.html')
     if (!existsSync(page)) continue
     const scan = scanFiles(collectFiles([dir]), { root: dir })
-    const url = pathToFileURL(page).href
-    const render = pw ? await checkRender(url, { widths: [390, 1440], from, screenshots: false }) : { findings: [] }
-    const all = [...scan.findings, ...render.findings]
-    row[variant] = { ...totals(all), ids: [...new Set(all.filter((f) => f.severity !== 'P2').map((f) => f.id))].sort() }
-    if (pw) await shoot(url, join(SHOTS, `${brief}-${variant}`))
+    const server = await serve(dir)                       // http, not file://: fonts and CORS behave as deployed
+    const url = `http://127.0.0.1:${server.address().port}/index.html`
+    try {
+      const render = pw ? await checkRender(url, { widths: [390, 1440], from, screenshots: false }) : { findings: [] }
+      const all = [...scan.findings, ...render.findings]
+      row[variant] = { ...totals(all), ids: [...new Set(all.filter((f) => f.severity !== 'P2').map((f) => f.id))].sort() }
+      if (pw) await shoot(url, join(SHOTS, `${brief}-${variant}`))
+    } finally { server.close() }
   }
   rows.push(row)
 }
@@ -41,6 +46,20 @@ for (const r of rows) {
 }
 writeFileSync(join(HERE, 'results.md'), md.join('\n') + '\n')
 console.log(md.join('\n'))
+
+function serve(dir) {
+  const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.avif': 'image/avif', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.json': 'application/json' }
+  return new Promise((ok) => {
+    const s = createServer(async (req, res) => {
+      const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^([\\/])+/, '')
+      const file = join(dir, path || 'index.html')
+      if (!file.startsWith(dir)) { res.writeHead(403); return res.end() }
+      try { const body = await readFile(file); res.writeHead(200, { 'content-type': types[extname(file).toLowerCase()] || 'application/octet-stream' }); res.end(body) }
+      catch { res.writeHead(404); res.end() }
+    })
+    s.listen(0, '127.0.0.1', () => ok(s))
+  })
+}
 
 async function shoot(url, base) {
   const browser = await pw.chromium.launch()

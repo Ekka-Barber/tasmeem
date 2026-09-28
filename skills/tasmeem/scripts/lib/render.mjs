@@ -224,6 +224,7 @@ function pageAudit({ width, motion }) {
       const floor = FLOOR[script] ? FLOOR[script][display ? 1 : 0] : 1.35
       if (lh + 0.001 < floor && (lines >= 1.8 || own.length > 80)) add(script === 'latin' ? 'TY-12' : 'SC-03', display ? 'P1' : 'P0', `${script} ${display ? 'display' : 'body'} line-height ${lh.toFixed(2)} (< ${floor})`, el)
     }
+    if (fs < 20 && /^(kufam|reem kufi( fun| ink)?|lemonada|aref ruqaa( ink)?|rakkas|jomhuria|lalezar|katibeh|mirza|blaka( hollow| ink)?|marhey|qahiri|ruwudu|badeen display|oi|vibes|handjet|[\w -]*\bdisplay\b[\w -]*)$/i.test(fam)) add('TY-24', 'P1', `display face "${fam}" at ${fs}px`, el)
     if (own.length > 80 && fs < 16 && width <= 480) add('TY-13', 'P1', `body text ${fs}px on a phone`, el)
     if (fs < 12) add('TY-13', 'P1', `text ${fs}px`, el)
     if (script === 'latin' && own.length > 60 && ls > 0.05) add('TY-10', 'P1', 'wide tracking on body text', el)

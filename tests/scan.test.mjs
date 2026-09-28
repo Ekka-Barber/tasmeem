@@ -46,6 +46,18 @@ test('Latin-only pages are not checked for RTL physical properties', () => {
   assert.ok(!res.findings.some((f) => f.id === 'SC-05'))
 })
 
+test('eval lesson: a bare <em> accent inside the headline is TY-04', () => {
+  const res = scanDocs([{ file: 'i.html', rel: 'i.html', text: '<h1>نحمّص <em>كل صباح</em>،<br>على دفعات صغيرة.</h1>' }])
+  assert.ok(res.findings.some((f) => f.id === 'TY-04'))
+})
+
+test('eval lesson: a display face at label size is TY-24', () => {
+  const res = scanDocs([{ file: 'a.css', rel: 'a.css', text: '.nav a { font-family: "Kufam", sans-serif; font-size: 16px; } .hero h1 { font-family: "Kufam"; font-size: 64px; }' }])
+  const hits = res.findings.filter((f) => f.id === 'TY-24')
+  assert.equal(hits.length, 1)
+  assert.match(hits[0].message, /16px/)
+})
+
 test('owner content files downgrade copy tells to advisory', () => {
   const res = scanDocs([{ file: 'content/home.json', rel: 'content/home.json', text: '{"intro": "هذا ليس مجرد متجر، بل حكاية"}' }])
   const f = res.findings.find((x) => x.id === 'CP-03')

@@ -42,6 +42,7 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 **Rules.**
 - **Arabic appears smaller.** At the same `font-size`, many Arabic faces look 10 to 20% smaller than their Latin partner. Measure, then fix with `size-adjust` in the Arabic `@font-face`, or with a `:lang(ar)` size step. Never guess.
 - **Weights under 400 break down** at interface sizes, because the thin strokes disappear. Keep 400 to 700 for UI and body text.
+- **Display faces stay large.** Geometric Kufi display faces simplify or drop dots at small sizes: in Kufam, a final ن at 16px reads as ر. Use display faces at 24px and up, and set labels, buttons, navigation and prices in the UI or body face (TY-24).
 - **Load the Arabic subset.** Use `unicode-range` for U+0600–06FF, U+0750–077F, U+08A0–08FF and U+FB50–FDFF, U+FE70–FEFF, and preload only the body weight.
 - **Check real coverage** of what you set: Arabic-Indic digits, «٪», «ﷺ» (U+FDFA), and the Saudi riyal sign (U+20C1, encoded in 2025; many fonts still lack it, so fall back to «ر.س» or an SVG).
 

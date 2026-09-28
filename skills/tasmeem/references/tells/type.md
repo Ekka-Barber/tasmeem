@@ -125,6 +125,12 @@ Long words at display sizes that overflow on phones and tablets.
 **Fix:** `overflow-wrap: anywhere; min-width: 0` on display headings, a smaller `clamp()` minimum, or shorter copy.
 **Sources:** HM IM
 
+### TY-24 · Display face at text size · P1 · scan render
+A face drawn for display (Kufam, Reem Kufi, Lemonada, Aref Ruqaa, Rakkas, anything named "Display") used for labels, buttons, navigation or small text, below about 20px.
+**Why:** display faces trade letter distinctions for character. At text size those distinctions vanish: in Kufam, the dot of a final ن drops out, so «العنوان» reads as «العنوار». Found in tasmeem's own eval of an Arabic roastery page.
+**Fix:** display faces at 24px and up. Labels, buttons, navigation and prices use the UI or body face.
+**Sources:** T
+
 ### TY-23 · Hollow, underlined or synthetic text · P2 · scan
 Outlined (hollow) headlines, underlines on things that are not links, and faux bold or italic synthesised by the browser.
 **Fix:** solid text; underline links only; `font-synthesis: none` with the real weights loaded.

@@ -17,6 +17,8 @@ const BODY_SEL = /(^|[\s,>+~])(body|p|html|:root|main|article|\.?[\w-]*(body|pro
 const GROUND_SEL = /^(\s*(html|body|:root|main|#root|#__next|\.app|\.page|\.site))\s*$/i
 const GROUND_VAR = /^--(bg|background|ground|page|paper|canvas|surface-0|base|body-bg|color-bg|color-background)(-|$)/i
 const REVEAL_SEL = /(reveal|fade-?in|fade-?up|slide-?up|animate-on-scroll|aos|scroll-anim|appear|inview|in-view)/i
+// Faces drawn for display sizes: letter distinctions (dots, counters) disappear at text sizes.
+export const DISPLAY_FACE = /^(kufam|reem kufi( fun| ink)?|lemonada|aref ruqaa( ink)?|rakkas|jomhuria|lalezar|katibeh|mirza|blaka( hollow| ink)?|marhey|qahiri|ruwudu|badeen display|oi|vibes|handjet|[\w -]*\bdisplay\b[\w -]*)$/i
 const LAYOUT_PROPS = /^(width|height|top|left|right|bottom|margin|margin-\w+|padding|padding-\w+|inset|inset-\w+|max-height|max-width|min-height|flex-basis)$/
 const PHYSICAL_PROPS = /^(margin-left|margin-right|padding-left|padding-right|border-left|border-right|border-left-\w+|border-right-\w+|left|right)$/
 const TW_PHYSICAL = /^-?(?:(?:m[lr]|p[lr]|border-[lr]|rounded-[lr]|rounded-[tb][lr]|left|right|space-x)-[\w./[\]-]+|text-left|text-right|float-left|float-right|border-[lr]|rounded-[lr])$/
@@ -173,6 +175,8 @@ function cssRules(doc, parsed, sig, push, acc) {
         if (sel.startsWith('@font-face')) { acc.fontFacesDeclared.add(first); continue }
         acc.fontFamiliesUsed.set(first, (acc.fontFamiliesUsed.get(first) || 0) + 1)
         if (/monospace|mono\b|courier|consolas|menlo/.test(vl) && BODY_SEL.test(sel) && !/code|pre|kbd|samp/.test(sel)) push(doc, 'TY-14', 'P1', L, 'monospace body text', sel)
+        const size = toPx(decl['font-size'] || '')
+        if (DISPLAY_FACE.test(first) && size !== null && size < 20) push(doc, 'TY-24', 'P1', L, `display face "${first}" at ${size}px (keep display faces at 24px and up)`, sel)
       }
       if (d.prop === 'line-height') {
         const n = parseFloat(v)
@@ -242,7 +246,7 @@ function markupRules(doc, sig, push, acc) {
   // Headline with one accented word (SD5 / TY-04)
   for (const m of t.matchAll(/<h([1-2])\b[^>]*>((?:(?!<\/h\1>)[\s\S]){0,400})<\/h\1>/g)) {
     const inner = m[2]
-    if (!/\.map\(/.test(inner) && /<(span|em|mark|i|strong|b)\b[^>]*(class(Name)?|style)=/.test(inner) && inner.replace(/<[^>]+>/g, '').trim().split(/\s+/).length > 1) push(doc, 'TY-04', 'P1', L(m.index), 'one word styled differently inside the headline', inner.replace(/\s+/g, ' ').slice(0, 90))
+    if (!/\.map\(/.test(inner) && (/<(span|strong|b)\b[^>]*(class(Name)?|style)=/.test(inner) || /<(em|mark|i)\b/.test(inner)) && inner.replace(/<[^>]+>/g, '').trim().split(/\s+/).length > 1) push(doc, 'TY-04', 'P1', L(m.index), 'one word styled differently inside the headline', inner.replace(/\s+/g, ' ').slice(0, 90))
     if (/\bitalic\b/.test(m[0])) push(doc, 'TY-03', 'P1', L(m.index), 'italic headline', m[0].slice(0, 90))
   }
   // Eyebrow directly before a heading

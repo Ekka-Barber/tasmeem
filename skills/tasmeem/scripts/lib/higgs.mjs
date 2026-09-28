@@ -68,8 +68,14 @@ export async function generate({ model, prompt, params = {}, refs = [], out, bud
     const args = ['generate', 'create', model, '--prompt', prompt, ...paramArgs(params)]
     for (const r of refs) args.push('--image-references', r)
     args.push('--wait')
-    const res = run(cli, args)
-    if (!res.ok || !res.json) throw new Error(`generation failed: ${res.stderr || res.stdout}`)
+    const started = Date.now()
+    let res = run(cli, args)
+    if (!res.ok || !res.json) {
+      // A gateway error can arrive after the job was accepted and charged: recover it instead of paying twice.
+      const recovered = recoverJob(cli, model, prompt, started)
+      if (!recovered) throw new Error(`generation failed (no matching job found in 'generate list'): ${res.stderr || res.stdout}`)
+      res = { ok: true, json: recovered }
+    }
     const jobs = Array.isArray(res.json) ? res.json : [res.json]
     for (const job of jobs) {
       let j = job
@@ -93,6 +99,21 @@ export async function generate({ model, prompt, params = {}, refs = [], out, bud
     }
   }
   return { ok: true, credits: total, files: results }
+}
+
+function recoverJob(cli, model, prompt, since) {
+  const deadline = Date.now() + 10 * 60 * 1000
+  while (Date.now() < deadline) {
+    const list = run(cli, ['generate', 'list'])
+    const jobs = Array.isArray(list.json) ? list.json : list.json?.items || []
+    const job = jobs.find((j) => j.job_type === model && j.params?.prompt === prompt && Date.parse(j.created_at) >= since - 60_000)
+    if (!job) return null
+    if (job.status === 'completed' && job.result_url) return job
+    if (/fail|error|cancel/i.test(job.status || '')) return null
+    const w = run(cli, ['generate', 'wait', job.id])        // blocks until the job settles
+    if (w.json && (w.json.result_url || w.json.status === 'completed')) return w.json.result_url ? w.json : { ...job, ...w.json }
+  }
+  return null
 }
 
 export function readPrompt(args) {
