@@ -1,0 +1,10 @@
+{
+  "name": "tasmeem",
+  "version": "0.1.0",
+  "description": "Arabic-first design skill: build, audit and polish interfaces that do not look AI-generated, in any writing system, with real assets through Higgsfield.",
+  "author": { "name": "Ekka Barber", "url": "https://github.com/Ekka-Barber" },
+  "homepage": "https://github.com/Ekka-Barber/tasmeem",
+  "repository": "https://github.com/Ekka-Barber/tasmeem",
+  "license": "MIT",
+  "keywords": ["design", "anti-slop", "arabic", "rtl", "i18n", "accessibility", "motion", "higgsfield"]
+}

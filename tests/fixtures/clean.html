@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f2a24">
+  <title>محمصة الحي</title>
+  <style>
+    @font-face { font-family: "Readex Pro"; src: url("/fonts/readex.woff2") format("woff2"); font-display: swap; }
+    :root { --ground: oklch(0.3 0.03 150); --ink: oklch(0.96 0.01 150); --accent: oklch(0.72 0.14 60); --dur: 180ms; }
+    body { font-family: "Readex Pro", sans-serif; background: var(--ground); color: var(--ink); line-height: 1.7; margin: 0; }
+    :is(:lang(ar), :lang(fa)) { letter-spacing: 0; font-style: normal; }
+    .intro { margin-inline-start: 1.5rem; padding-inline: 1rem; text-align: start; max-inline-size: 60ch; }
+    .skip { position: absolute; inset-inline-start: 1rem; transform: translateY(-200%); padding: 0.75rem 1rem; }
+    .skip:focus-visible { transform: none; }
+    .cta { display: inline-flex; align-items: center; padding-inline: 1.25rem; transition: transform var(--dur) cubic-bezier(0.23, 1, 0.32, 1); min-block-size: 48px; }
+    .cta:active { transform: scale(0.97); }
+    .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+  <main id="main">
+    <h1>محمصة الحي في حي الملز</h1>
+    <p class="intro">نحمّص البن كل صباح على دفعات صغيرة، ونبيعه بالوزن.</p>
+    <a class="cta" href="/order">اطلب حبوب هذا الأسبوع</a>
+    <img src="/roaster.webp" alt="المحمصة وقت التحميص" width="1200" height="800">
+  </main>
+</body>
+</html>

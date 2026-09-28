@@ -1,0 +1,20 @@
+{
+  "name": "tasmeem",
+  "version": "0.1.0",
+  "description": "Arabic-first design skill for coding agents: builds, audits and polishes interfaces that do not look AI-generated, in any writing system, with real assets through Higgsfield.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Ekka Barber",
+  "homepage": "https://github.com/Ekka-Barber/tasmeem",
+  "repository": { "type": "git", "url": "git+https://github.com/Ekka-Barber/tasmeem.git" },
+  "keywords": ["agent-skill", "claude-code", "design", "anti-slop", "arabic", "rtl", "i18n", "accessibility", "higgsfield", "design-system"],
+  "bin": { "tasmeem": "skills/tasmeem/scripts/tasmeem.mjs" },
+  "files": ["skills/", "README.md", "README.ar.md", "LICENSE", "NOTICE", "CREDITS.md"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "scan:fixtures": "node skills/tasmeem/scripts/tasmeem.mjs scan tests/fixtures"
+  },
+  "peerDependencies": { "playwright": ">=1.40" },
+  "peerDependenciesMeta": { "playwright": { "optional": true } }
+}

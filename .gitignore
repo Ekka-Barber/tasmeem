@@ -1,0 +1,5 @@
+node_modules/
+.tasmeem/
+*.log
+.DS_Store
+evals/runs/
