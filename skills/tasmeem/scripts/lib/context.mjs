@@ -27,8 +27,9 @@ export async function context(target = '.') {
   let html = ''
   for (const f of files) { const t = read(f); for (const s of scriptsIn(t)) scripts.add(s); if (!html && /<html\b/.test(t)) html = (t.match(/<html\b[^>]*>/) || [''])[0] }
   out.push('', '## Writing systems found', `${[...scripts].join(', ') || 'latin only'} ${html ? `· root: ${html}` : ''}`)
-  const guide = { arabic: 'arabic.md (+ bidi.md, numerals-dates.md)', hebrew: 'hebrew.md (+ bidi.md)', cjk: 'cjk.md', indic: 'indic.md', thai: 'southeast-asian.md', cyrillic: 'latin-greek-cyrillic.md', greek: 'latin-greek-cyrillic.md' }
+  const guide = { arabic: 'arabic.md (+ bidi.md, numerals-dates.md, punctuation.md)', persian: 'persian.md' }
   for (const s of scripts) if (guide[s]) out.push(`- read references/scripts-lang/${guide[s]}`)
+  out.push('- read references/scripts-lang/english.md for English text (and for the Latin partner of an Arabic or Persian face)')
 
   // Tools.
   const pw = await loadPlaywright(root)

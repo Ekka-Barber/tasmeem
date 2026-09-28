@@ -24,7 +24,7 @@ tasmeem stands on the work of many people who wrote down what good interfaces ar
 
 tasmeem's own additions are marked `T`:
 - the writing-system tells (`SC-`);
-- the Arabic, Persian, Urdu, Hebrew, CJK, Indic and Southeast Asian guides;
+- the Arabic, Persian and English guides;
 - the Arabic copy tells;
 - the render checks for script typography and fonts actually used;
 - the Higgsfield bridge with its cost gate;

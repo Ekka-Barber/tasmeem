@@ -15,7 +15,7 @@ Read only the category files you need:
 | [imagery.md](imagery.md) | `IG-` | stock looks, placeholders, generated-image defects |
 | [system.md](system.md) | `SY-` | drift from the design system, sameness |
 | [quality.md](quality.md) | `QA-` | accessibility and engineering failures |
-| [scripts.md](scripts.md) | `SC-` | writing-system tells: Arabic, Hebrew, CJK, Indic, Thai… |
+| [scripts.md](scripts.md) | `SC-` | writing-system tells: Arabic, Persian, and English next to them |
 
 ## Entry format
 

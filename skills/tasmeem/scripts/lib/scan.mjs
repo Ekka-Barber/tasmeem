@@ -42,13 +42,13 @@ export function scanDocs(input) {
   // ---- Project signals ----------------------------------------------------
   const all = docs.map((d) => d.text).join('\n')
   const sig = {
-    arabic: SCRIPTS.arabic.test(stripCode(all)) || /\blang=["'](ar|fa|ur|ps|ckb)/.test(all),
-    rtl: /\bdir=["']rtl["']/.test(all) || /\blang=["'](ar|fa|ur|he|ps|ckb|yi|dv)/.test(all),
+    arabic: SCRIPTS.arabic.test(stripCode(all)) || /\blang=["'](ar|fa)/.test(all),
+    rtl: /\bdir=["']rtl["']/.test(all) || /\blang=["'](ar|fa)/.test(all),
     reducedMotion: /prefers-reduced-motion|useReducedMotion|reducedMotion|motion-reduce:/.test(all),
     focusVisible: /focus-visible/.test(all),
     motion: /@keyframes|animation(-name)?\s*:|animation-timeline|framer-motion|motion\/react|\bgsap\b|\banimate-(?!none)[\w-]+|view-transition|\.animate\(\s*\[/.test(all),
     tokens: /(^|[\s{;])--[\w-]+\s*:/.test(all),
-    langScopedReset: /:lang\((ar|fa|ur)[^)]*\)[^{]*\{[^}]*letter-spacing\s*:\s*(0|normal)/s.test(all),
+    langScopedReset: /:lang\((ar|fa)[^)]*\)[^{]*\{[^}]*letter-spacing\s*:\s*(0|normal)/s.test(all),
   }
   sig.rtl = sig.rtl || sig.arabic
 
@@ -162,12 +162,12 @@ function cssRules(doc, parsed, sig, push, acc) {
         if (em !== null && em < -0.04 && HEADING_SEL.test(sel)) push(doc, 'TY-09', 'P1', L, `crushed tracking ${v}`, sel)
         if (em !== null && em > 0.05 && BODY_SEL.test(sel) && !/uppercase/.test(decl['text-transform'] || '')) push(doc, 'TY-10', 'P1', L, `wide tracking on body text ${v}`, sel)
         if (sig.arabic && em !== null && em !== 0 && !langScoped) push(doc, 'SC-01', 'P1', L, `letter-spacing ${v} can reach Arabic text (confirm with render; reset under :lang(ar))`, sel, { confirm: 'render' })
-        if (/:lang\((ar|fa|ur)|\[lang[|^]?=["']?(ar|fa|ur)/.test(sel) && em !== null && em !== 0) push(doc, 'SC-01', 'P0', L, `letter-spacing ${v} set on Arabic`, sel)
+        if (/:lang\((ar|fa)|\[lang[|^]?=["']?(ar|fa)/.test(sel) && em !== null && em !== 0) push(doc, 'SC-01', 'P0', L, `letter-spacing ${v} set on Arabic`, sel)
       }
       if (d.prop === 'font-style' && /italic|oblique/.test(vl)) {
         if (HEADING_SEL.test(sel)) push(doc, 'TY-03', 'P1', L, 'italic display type', sel)
-        if (/:lang\((ar|fa|ur|he|ja|zh|ko|hi|th)/.test(sel)) push(doc, 'SC-02', 'P1', L, 'italic on a script without italics', sel)
-        else if (sig.arabic && !/:lang\((en|fr|de|es|it|pt)/.test(sel) && !/\b(em|i|cite|blockquote)\b/.test(sel)) push(doc, 'SC-02', 'P1', L, 'italic can reach Arabic text (confirm with render)', sel, { confirm: 'render' })
+        if (/:lang\((ar|fa)/.test(sel)) push(doc, 'SC-02', 'P1', L, 'italic on a script without italics', sel)
+        else if (sig.arabic && !/:lang\(en/.test(sel) && !/\b(em|i|cite|blockquote)\b/.test(sel)) push(doc, 'SC-02', 'P1', L, 'italic can reach Arabic text (confirm with render)', sel, { confirm: 'render' })
       }
       if (d.prop === 'text-transform' && vl === 'uppercase' && /(^|[\s,])(p|body|\.?[\w-]*(body|prose|paragraph|copy))(?=$|[\s,:.])/i.test(sel)) push(doc, 'TY-11', 'P1', L, 'uppercase body text', sel)
       if (d.prop === 'font-family' || (/^--font/.test(d.prop) && /["',]/.test(v))) {
@@ -183,7 +183,6 @@ function cssRules(doc, parsed, sig, push, acc) {
         const unitless = /^[\d.]+$/.test(v.trim())
         if (unitless && n < 1.35 && BODY_SEL.test(sel) && !HEADING_SEL.test(sel)) push(doc, 'TY-12', 'P0', L, `body line-height ${v}`, sel)
         if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.5 && !HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic line-height ${v} (floor 1.6 for body)`, sel)
-        if (unitless && /:lang\(ur/.test(sel) && n < 2) push(doc, 'SC-03', 'P0', L, `Urdu line-height ${v} (Nastaliq floor 2.2)`, sel)
       }
       if (d.prop === 'text-align' && vl === 'justify') push(doc, 'TY-16', 'P2', L, sig.arabic ? 'justified text (Arabic without kashida support leaves rivers)' : 'justified text', sel)
       if (/text-stroke/.test(d.prop) && /transparent/.test(decl.color || decl['-webkit-text-fill-color'] || '')) push(doc, 'TY-23', 'P2', L, 'hollow text', sel)
@@ -223,7 +222,7 @@ function cssRules(doc, parsed, sig, push, acc) {
       if (sig.rtl && PHYSICAL_PROPS.test(d.prop) && !/^(0|auto|0px)$/.test(vl.trim()) && !langScoped) push(doc, 'SC-05', 'P1', L, `physical ${d.prop} in an RTL project (use the logical property)`, sel)
       if (sig.rtl && d.prop === 'text-align' && /^(left|right)$/.test(vl) && !langScoped) push(doc, 'SC-05', 'P1', L, `text-align: ${vl} in an RTL project (use start/end)`, sel)
       if (sig.rtl && d.prop === 'float' && /^(left|right)$/.test(vl)) push(doc, 'SC-05', 'P1', L, `float: ${vl} in an RTL project`, sel)
-      if (sig.arabic && d.prop === 'text-transform' && /uppercase|capitalize/.test(vl) && !/:lang\((en|fr|de|es|it|pt|tr|ru)/.test(sel)) push(doc, 'SC-08', 'P2', L, `text-transform: ${vl} may reach Arabic labels`, sel)
+      if (sig.arabic && d.prop === 'text-transform' && /uppercase|capitalize/.test(vl) && !/:lang\(en/.test(sel)) push(doc, 'SC-08', 'P2', L, `text-transform: ${vl} may reach Arabic labels`, sel)
     }
   }
 }
@@ -234,7 +233,7 @@ function markupRules(doc, sig, push, acc) {
   for (const m of t.matchAll(/<meta[^>]+name=["']viewport["'][^>]*>/gi)) if (/user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\.0)?\b/i.test(m[0])) push(doc, 'QA-06', 'P0', L(m.index), 'zoom disabled in the viewport meta', m[0])
   for (const m of t.matchAll(/<html\b[^>]*>/gi)) {
     if (!/\blang\s*=/.test(m[0])) push(doc, 'QA-04', 'P0', L(m.index), '<html> without lang', m[0])
-    else if (/\blang\s*=\s*\{?["'`]?(ar|fa|ur|he)/.test(m[0]) && !/\bdir\s*=/.test(m[0])) push(doc, 'SC-05', 'P1', L(m.index), 'RTL language without dir="rtl" on <html>', m[0])
+    else if (/\blang\s*=\s*\{?["'`]?(ar|fa)/.test(m[0]) && !/\bdir\s*=/.test(m[0])) push(doc, 'SC-05', 'P1', L(m.index), 'RTL language without dir="rtl" on <html>', m[0])
   }
   for (const m of t.matchAll(/<(img|Image)\b(?![^>]*\balt\s*=)[^>]*>/g)) push(doc, 'IG-05', 'P0', L(m.index), `<${m[1]}> without alt`, m[0])
   for (const m of t.matchAll(/<img\b[^>]*\bsrc\s*=\s*["']\s*["'][^>]*>/g)) push(doc, 'IG-04', 'P0', L(m.index), 'image with empty src', m[0])
@@ -322,7 +321,7 @@ function jsRules(doc, sig, push) {
   for (const m of t.matchAll(/initial=\{\{[^}]*opacity:\s*0[\s\S]{0,200}?whileInView/g)) push(doc, 'MO-06', 'P0', L(m.index), 'opacity 0 until whileInView: server HTML ships invisible content')
   for (const m of t.matchAll(/bounce:\s*0?\.[1-9]|type:\s*["']spring["'][^}]*damping:\s*[1-9]\b(?!\d)|ease:\s*["'](backOut|backInOut|anticipate)["']|elastic\.|back\.out|bounce\.out/g)) push(doc, 'MO-02', 'P1', L(m.index), 'overshooting motion', m[0])
   for (const m of t.matchAll(/addEventListener\(\s*["']scroll["'][^)]*\)/g)) if (!/passive\s*:\s*true/.test(m[0]) || /getBoundingClientRect|offsetTop|scrollTop/.test(t.slice(m.index, m.index + 600))) push(doc, 'MO-17', 'P1', L(m.index), 'scroll listener doing work on the main thread (prefer CSS scroll timelines or IntersectionObserver)')
-  for (const m of t.matchAll(/getMonth\(\)\s*\+\s*1|["'`]\s*\$\s*["'`]\s*\+|\+\s*["'`]\s*(SAR|ر\.س|USD|EUR)\s*["'`]/g)) push(doc, 'QA-10', 'P1', L(m.index), 'hand-built date or currency (use Intl)', m[0])
+  for (const m of t.matchAll(/getMonth\(\)\s*\+\s*1|["'`]\s*\$\s*["'`]\s*\+|\+\s*["'`]\s*(SAR|\u0631\.\u0633|USD|EUR)\s*["'`]/g)) push(doc, 'QA-10', 'P1', L(m.index), 'hand-built date or currency (use Intl)', m[0])
   for (const m of t.matchAll(/\b(react-countup|CountUp|useCountUp)\b/g)) push(doc, 'MO-11', 'P2', L(m.index), 'count-up numbers')
 }
 
@@ -331,6 +330,7 @@ function copyRules(doc, sig, push, { isContent }) {
   const owner = isContent || /(^|\/)(content|data|messages|locales|i18n|posts|copy)\//.test(doc.rel)
   const sev = (s) => (owner && s !== 'P0' ? 'P2' : s)
   const tag = owner ? ' (content file: if the owner wrote it, leave it)' : ''
+  const faDoc = /\blang=["']fa/.test(doc.text)
   let dashes = 0
   let firstDash = 0
   for (const s of strings) {
@@ -339,7 +339,7 @@ function copyRules(doc, sig, push, { isContent }) {
     const norm = isAr ? stripTashkeel(text) : text.toLowerCase()
     for (const [lang, lists] of Object.entries(DATA)) {
       if (lang.length !== 2) continue
-      if ((lang === 'ar') !== isAr) continue
+      if ((lang === 'ar' || lang === 'fa') !== isAr) continue
       for (const [id, phrases] of Object.entries(lists)) {
         for (const p of phrases) {
           const hit = p.includes('.*') ? new RegExp(p, 'i').test(norm) : norm.includes(isAr ? stripTashkeel(p) : p)
@@ -353,10 +353,11 @@ function copyRules(doc, sig, push, { isContent }) {
     if (/—/.test(text)) { dashes += (text.match(/—/g) || []).length; firstDash ||= s.line }
     if (/\p{Extended_Pictographic}/u.test(text) && !/[©®™]/.test(text)) push(doc, 'CP-13', sev('P1'), s.line, `emoji in interface text${tag}`, text.slice(0, 60))
     if (sig.rtl && isAr && /[a-z\u0600-\u06FF]\s*→|→\s*$/.test(text)) push(doc, 'CP-10', 'P1', s.line, 'right-pointing arrow in Arabic text (forward is ←)', text.slice(0, 60))
-    if (isAr && arabicShare(text) > 0.6 && /[\u0600-\u06FF]\s?[?;,](\s|$)/.test(text)) push(doc, 'SC-09', 'P2', s.line, 'Latin punctuation in Arabic text (use ؟ ، ؛)', text.slice(0, 60))
+    if (isAr && arabicShare(text) > 0.6 && /[\u0600-\u06FF]\s?[?;,](\s|$)/.test(text)) push(doc, 'SC-09', 'P2', s.line, 'Latin punctuation in Arabic text (use \u061F \u060C \u061B)', text.slice(0, 60))
+    if (isAr && /[\u064a\u0643]/.test(text) && (faDoc ? true : count(text, /[\u067e\u0686\u0698\u06af\u06cc\u06a9]/g) > count(text, /[\u064a\u0643]/g))) push(doc, 'SC-09', 'P2', s.line, 'Arabic \u064a/\u0643 inside Persian text (use \u06cc/\u06a9)', text.slice(0, 60))
     if (isAr && (/\u0640{2,}/.test(text) || /[\u0621-\u064a]\u0640+[\u0621-\u064a]/.test(text))) push(doc, 'SC-16', 'P2', s.line, 'tatweel used for stretching', text.slice(0, 60))
     if (/[0-9]/.test(text) && /[\u0660-\u0669\u06F0-\u06F9]/.test(text)) push(doc, 'SC-07', 'P1', s.line, 'Western and Arabic-Indic digits in one string', text.slice(0, 60))
-    if (/\b(\d{1,3}(,\d{3})+|\d+(\.\d+)?[kKmM]\+?)\s+(users|customers|teams|companies|downloads|clients)\b|\b99\.9+%|\b\d+(\.\d)?\/5\b|\btrusted by\b|أكثر من\s+[\d٠-٩]+\s+(عميل|مستخدم)/i.test(text)) push(doc, 'CP-07', owner ? 'P2' : 'P1', s.line, 'a metric or social proof: confirm the owner supplied it', text.slice(0, 80))
+    if (/\b(\d{1,3}(,\d{3})+|\d+(\.\d+)?[kKmM]\+?)\s+(users|customers|teams|companies|downloads|clients)\b|\b99\.9+%|\b\d+(\.\d)?\/5\b|\btrusted by\b|\u0623\u0643\u062B\u0631 \u0645\u0646\s+[\d\u0660-\u0669]+\s+(\u0639\u0645\u064A\u0644|\u0645\u0633\u062A\u062E\u062F\u0645)/i.test(text)) push(doc, 'CP-07', owner ? 'P2' : 'P1', s.line, 'a metric or social proof: confirm the owner supplied it', text.slice(0, 80))
   }
   if (dashes >= 3 && !owner) push(doc, 'CP-05', 'P1', firstDash, `${dashes} em dashes in interface strings`)
 }
@@ -406,13 +407,15 @@ function blankComments(text, ext) {
   return out
 }
 
+const count = (s, re) => (s.match(re) || []).length
+
 function arabicShare(s) {
-  const ar = (s.match(/[؀-ۿ]/g) || []).length
+  const ar = (s.match(/[\u0600-\u06FF]/g) || []).length
   const lat = (s.match(/[A-Za-z]/g) || []).length
   return ar / Math.max(1, ar + lat)
 }
 
-const stripTashkeel = (s) => s.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآ]/g, 'ا')
+const stripTashkeel = (s) => s.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[\u0623\u0625\u0622]/g, '\u0627')
 const stripCode = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
 
 function colorFamilies(v) {

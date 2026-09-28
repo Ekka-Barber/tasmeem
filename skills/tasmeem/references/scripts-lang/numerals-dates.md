@@ -31,20 +31,18 @@ const plural = new Intl.PluralRules(locale)
 | Language | Categories |
 |---|---|
 | Arabic | zero, one, two, few (3 to 10), many (11 to 99), other |
-| Hebrew | one, two, other (and many in some CLDR versions) |
-| Russian, Ukrainian, Polish | one, few, many, other |
-| English, German, Spanish | one, other |
-| Japanese, Chinese, Korean, Thai | other only |
+| Persian | one, other (the noun stays singular after a number: «۳ کتاب») |
+| English | one, other |
 
 Arabic forms for "file": «لا ملفات» / «ملف واحد» / «ملفان» / «3 ملفات» / «11 ملفاً» / «100 ملف».
 
 ## Calendars and weeks
 
-- Pin the calendar: `gregory`, `islamic-umalqura` (the Saudi civil Hijri), `persian`, `hebrew`, `buddhist` (Thailand), `japanese` (eras). Show both calendars where the audience expects it (Saudi government services often do).
+- Pin the calendar: `gregory`, `islamic-umalqura` (the Saudi civil Hijri) or `persian` (Solar Hijri, Iran and Afghanistan). Show both calendars where the audience expects it (Saudi government services often do).
 - Month names depend on the locale, not only on the language. Arabic Gregorian months are «يناير، فبراير…» in the Gulf and Egypt, «كانون الثاني، شباط…» in the Levant and Iraq. `Intl` handles this when the locale includes the region.
 - **Week start and weekend:**
-  - Saturday starts the week in most Arab countries, Monday in Europe, Sunday in the US and Israel.
-  - Weekends are Friday–Saturday in most of the Gulf, Saturday–Sunday in the UAE since 2022.
+  - Saturday starts the week in most Arab countries and in Iran; Sunday in the US; Monday in the UK and Europe.
+  - Weekends are Friday–Saturday in most of the Gulf, and Saturday–Sunday in the UAE since 2022. Check the current rules for Iran.
   - Use `new Intl.Locale(tag).getWeekInfo?.()` (or `.weekInfo`) where available, with a table fallback.
 
 ## Currency
@@ -55,8 +53,8 @@ Arabic forms for "file": «لا ملفات» / «ملف واحد» / «ملفا�
 
 ## Names, addresses, phone numbers
 
-- **Names:** a single "full name" field unless the service needs the parts. Do not assume "first/last". Allow Arabic and Latin characters, spaces, hyphens and apostrophes.
-- **Addresses:** follow the country format. Saudi national address: building number, street, district, city, postal code, additional number. UAE: often no postal code. Japan: largest to smallest unit.
+- **Names:** a single "full name" field unless the service needs the parts. Do not assume "first/last". Allow Arabic, Persian and Latin characters, spaces, hyphens and apostrophes.
+- **Addresses:** follow the country format. Saudi national address: building number, street, district, city, postal code, additional number. UAE: often no postal code. Iran: province, city, street, alley (کوچه), plate number, 10-digit postal code.
 - **Phone:** store E.164; accept the local form, `+` and `00` prefixes, spaces and dashes, and both digit systems.
 
 ## Sorting and search

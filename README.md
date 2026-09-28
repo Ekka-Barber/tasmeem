@@ -2,17 +2,17 @@
 
 # tasmeem · تصميم
 
-**Design that reads as made, not generated. Arabic first, every writing system.**
+**Design that reads as made, not generated. Arabic first, then Persian and English.**
 
 An agent skill for Claude Code, Codex, Cursor and any agent that reads `SKILL.md`. It builds, audits and polishes interfaces, measures its own work before handing it over, and authors real image assets instead of faking them with gradients.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-2f5d50)](LICENSE)
 ![Node 18+](https://img.shields.io/badge/node-%E2%89%A518-2f5d50)
 ![Dependencies: 0](https://img.shields.io/badge/dependencies-0-2f5d50)
-![Tells: 170](https://img.shields.io/badge/tells-170-b0643a)
-![Scripts: 7 families](https://img.shields.io/badge/writing%20systems-Arabic%20%C2%B7%20Hebrew%20%C2%B7%20CJK%20%C2%B7%20Indic%20%C2%B7%20Thai%20%C2%B7%20Latin-b0643a)
+![Tells: 169](https://img.shields.io/badge/tells-169-b0643a)
+![Languages](https://img.shields.io/badge/languages-Arabic%20%C2%B7%20Persian%20%C2%B7%20English-b0643a)
 
-[العربية](README.ar.md) · [Install](#install) · [Use it](#use-it) · [The scanner](#the-scanner) · [Writing systems](#every-writing-system-arabic-first) · [Real assets](#real-assets-with-higgsfield) · [Credits](CREDITS.md)
+[العربية](README.ar.md) · [Install](#install) · [Use it](#use-it) · [The scanner](#the-scanner) · [Before / after](#before-and-after) · [Languages](#arabic-persian-english) · [Real assets](#real-assets-with-higgsfield) · [Credits](CREDITS.md)
 
 </div>
 
@@ -42,12 +42,39 @@ Ask for it in Arabic and it gets worse:
 | | |
 |---|---|
 | **Direction before pixels** | A design read, a scene sentence, the subject's own world, three dials, a colour strategy, one signature element, then a two-level check for reflex choices before any code is written. |
-| **170 tells, one rulebook** | The machine-made patterns that twelve independent design skills and guides agree on, merged, deduplicated and rewritten, with conflicts resolved once. Each tell has a severity, a fix and the conditions under which it is allowed. |
-| **Evidence, not vibes** | A zero-dependency scanner reports 95 of those tells with file and line. An optional real-browser check reads computed styles: contrast on the actual background, the fonts actually drawn, overflow, held animations. |
-| **Arabic first** | Arabic type, direction, digits, plurals, calendars, bidi, forms, voice and copy tells, plus guides for Persian and Urdu, Hebrew, CJK, Indic, Thai, Lao, Khmer and Myanmar, Greek and Cyrillic. |
+| **169 tells, one rulebook** | The machine-made patterns that twelve independent design skills and guides agree on, merged, deduplicated and rewritten, with conflicts resolved once. Each tell has a severity, a fix and the conditions under which it is allowed. |
+| **Evidence, not vibes** | A zero-dependency scanner reports 96 of those tells with file and line. An optional real-browser check reads computed styles: contrast on the actual background, the fonts actually drawn, overflow, held animations. |
+| **Arabic first** | Arabic type, direction, digits, plurals, calendars, bidi, forms, voice and copy tells; Persian (ی and ک, ZWNJ, Persian digits, the Solar Hijri calendar); English, and pairing it with Arabic-script faces. |
 | **Real assets** | With Higgsfield, tasmeem builds the way a studio does: mockup → region map → generated plates → code that matches the mockup. It paints the material and codes the meaning. There is a cost gate on every generation, and a provenance file for every image. |
 | **Motion as a system** | Tokens, strong ease-out curves, interruptible transitions, scroll-driven animation, View Transitions, reveals that never hide content, reduced motion as a design. Produced video through Higgsfield or Remotion. |
 | **Brand wins over taste** | A brand's documented choices override the taste rules and are reported as exceptions. Nothing overrides contrast, focus, `lang` and `dir`, honesty, or script correctness. |
+
+## Before and after
+
+The same brief was run twice in fresh headless Claude Code sessions: a single-page site for a small Riyadh roastery, with every fact supplied in the brief. One run had no skills at all; the other had tasmeem. Nothing was touched up afterwards.
+
+<table>
+<tr><th>Without skills</th><th>With tasmeem</th></tr>
+<tr>
+<td><img src="docs/before-after/ar-roastery-before-desktop.png" alt="Without skills: cream ground, a red accented headline word, a pill badge and a hand-drawn SVG coffee bag"></td>
+<td><img src="docs/before-after/ar-roastery-after-desktop.png" alt="With tasmeem: green-coffee ground, a generated photograph of a roaster's cooling tray, a Kufi display name and an asymmetric split"></td>
+</tr>
+</table>
+
+| | Without skills | With tasmeem |
+|---|---|---|
+| Direction | cream ground, one headline phrase in red, a pill badge, three identical cards | green-coffee ground with roast-brown ink (the two states of the bean), an asymmetric split, prices set as a menu |
+| Images | a hand-drawn SVG bag | two comp mockups, then a generated photograph of a cooling tray and a transparent green-bean cutout, each with its provenance file |
+| Facts | as supplied | as supplied; the missing ones (a price per kilo) listed, not invented |
+| Measured by tasmeem (P0 · P1 · P2) | 2 · 9 · 1 | 0 · 8 · 0 |
+| Time, credits | 7 min | 18 min, 6.5 Higgsfield credits |
+
+The eight P1 findings in the tasmeem run are one real defect. It set the display face Kufam at label size, where the dot of a final ن disappears, so «العنوان» reads «العنوار». The eval exposed a gap in the rulebook, and TY-24 now catches it.
+
+The runs are reproducible with [`evals/run.mjs`](evals/run.mjs), and the results table is in [evals/results.md](evals/results.md).
+
+<p align="center"><img src="docs/before-after/ar-roastery-after-mobile.png" width="300" alt="With tasmeem, on a phone"></p>
+
 
 ## Install
 
@@ -136,27 +163,23 @@ A brand's own choices are recorded in `DESIGN.md` under **Brand exceptions** (`C
 | Category | Tells | Examples |
 |---|---|---|
 | Colour `CO` | 16 | purple-to-blue gradient, unchosen indigo, cream by default, gradient text, glow, halos |
-| Type `TY` | 23 | Inter for everything, the tasteful-font cluster, italic display, the accented headline word, eyebrows |
+| Type `TY` | 24 | Inter for everything, the tasteful-font cluster, italic display, the accented headline word, eyebrows, display faces at text size |
 | Layout `LA` | 23 | the centred hero, three icon cards, the stat strip, 01/02/03 scaffolding, overflow |
 | Components `CM` | 20 | kit defaults, glass by reflex, side stripes, icon chips, redrawn browser chrome, missing states |
 | Motion `MO` | 18 | one fade-up for everything, bounce, `transition: all`, animated layout, hidden-until-animated content |
-| Copy `CP` | 16 | buzzwords in six languages, "not X but Y", invented metrics, placeholders, translation-shaped Arabic |
+| Copy `CP` | 16 | buzzwords in English, Arabic and Persian, "not X but Y", invented metrics, placeholders, translation-shaped Arabic |
 | Imagery `IG` | 12 | stock people, the generated-illustration look, placeholder images, garbled text in generated images |
 | System `SY` | 7 | design-system drift, default-attractor sameness, mixed icon families |
 | Quality `QA` | 16 | contrast, focus, headings, `lang`, targets, zoom, forms, errors |
-| Scripts `SC` | 19 | tracked Arabic, fake italics, script line-height floors, fallback glyphs, physical CSS in RTL, bidi |
+| Scripts `SC` | 17 | tracked Arabic, fake italics, script line-height floors, fallback glyphs, physical CSS in RTL, bidi |
 
-## Every writing system, Arabic first
+## Arabic, Persian, English
 
-| Script | What tasmeem knows |
+| Language | What tasmeem knows |
 |---|---|
-| **Arabic** | Naskh, Kufi, Ruqaa and display roles; families with their Latin partners; size balancing; line heights; never tracking, italics or case; punctuation «، ؛ ؟»; digits policy; six plural forms; Hijri and Gregorian; the Saudi national address; bidi islands; the "Arabic costume" reflex |
-| **Persian, Urdu** | ی and ک, ZWNJ, Extended Arabic-Indic digits, the Solar Hijri calendar, Nastaliq's line height |
-| **Hebrew** | niqqud, geresh, gender agreement, week and weekend |
-| **Chinese, Japanese, Korean** | `lang`-dependent glyphs, kinsoku, `keep-all`, autospace, vertical writing, ruby |
-| **Indic** | shaping, the headline bar, size balancing, lakh and crore grouping |
-| **Thai, Lao, Khmer, Myanmar** | dictionary line breaking, stacked marks, the Buddhist era, Unicode vs Zawgyi |
-| **Latin, Greek, Cyrillic** | coverage, `lang`-aware case, hyphenation, length, local punctuation |
+| **Arabic** | Naskh, Kufi, Ruqaa and display roles; families and their Latin partners; size balancing; line heights; never tracking, italics or case; display faces kept large; punctuation «، ؛ ؟»; the digits policy; six plural forms; Hijri and Gregorian; the Saudi national address; bidi islands; the "Arabic costume" reflex |
+| **Persian** | ی and ک (never ي and ك), ZWNJ in compounds, Extended Arabic-Indic digits and separators, the Solar Hijri calendar, Nastaliq kept to display and poetry, Persian machine-copy tells |
+| **English** | coverage, case and hyphenation with `lang`, tracking limits, measure, curly punctuation, sentence case, and matching the Latin partner to an Arabic or Persian face |
 
 ## Real assets with Higgsfield
 
@@ -188,8 +211,8 @@ skills/tasmeem/
 ├─ SKILL.md                 router: setup, non-negotiables, route table, the tells to keep in mind (138 lines)
 ├─ references/
 │  ├─ core/                 direction · honesty · the delivery gate
-│  ├─ tells/                170 tells in 10 categories, each with severity, fix, allowed-when, sources
-│  ├─ scripts-lang/         Arabic, Persian/Urdu, Hebrew, CJK, Indic, SE Asian, Latin/Greek/Cyrillic, bidi, numerals, punctuation
+│  ├─ tells/                169 tells in 10 categories, each with severity, fix, allowed-when, sources
+│  ├─ scripts-lang/         Arabic, Persian, English, bidi, numerals and dates, punctuation
 │  ├─ craft/                typography · colour and tones · layout · components and 8 states · forms · a11y and performance
 │  ├─ motion/               principles · techniques · produced video
 │  ├─ brand/                identity
@@ -204,7 +227,7 @@ The agent reads `SKILL.md` (a few hundred tokens), then only the references the 
 ## Tests
 
 ```bash
-npm test      # node:test: 12 tests over fixtures (AI-slop, Arabic-slop, Tailwind/framer, a clean Arabic page)
+npm test      # node:test: 15 tests over fixtures (AI slop, Arabic slop, Persian copy, Tailwind and framer, a clean Arabic page)
 ```
 
 ## Credits

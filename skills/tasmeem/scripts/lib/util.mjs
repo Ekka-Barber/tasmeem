@@ -39,18 +39,11 @@ export const read = (f) => readFileSync(f, 'utf8')
 export const rel = (f, root = process.cwd()) => relative(root, f).split(sep).join('/')
 export const exists = existsSync
 
-// Unicode script detection (the scripts tasmeem has guides for).
+// Unicode script detection for the supported languages: Arabic and Persian (Arabic script) and English (Latin).
 export const SCRIPTS = {
-  arabic: /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/u,
-  hebrew: /[֐-׿יִ-ﭏ]/u,
-  cjk: /[぀-ヿ㐀-䶿一-鿿가-힯ᄀ-ᇿ]/u,
-  indic: /[ऀ-෿]/u,
-  thai: /[฀-໿ក-៿က-႟]/u,
-  cyrillic: /[Ѐ-ӿ]/u,
-  greek: /[Ͱ-Ͽ]/u,
+  arabic: /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/u,
+  persian: /[\u067E\u0686\u0698\u06AF\u06CC\u06A9\u06F0-\u06F9]/u, // \u067E \u0686 \u0698 \u06AF \u06CC \u06A9 and Persian digits
 }
-export const JOINED_OR_BAR = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿܀-ݏ߀-߿᠀-᢯ऀ-੿]/u
-export const RTL_CHARS = /[֐-ࣿיִ-﷿ﹰ-﻿]/u
 
 export function scriptsIn(text) {
   const found = []

@@ -1,6 +1,6 @@
 # Typography tells (`TY-`)
 
-Script-specific typography (letter-spacing on Arabic, CJK line breaking, Indic line height…) lives in [scripts.md](scripts.md). The tells below apply to every script unless an entry says otherwise.
+Script-specific typography (letter-spacing on Arabic, Persian ZWNJ, Arabic-script line height…) lives in [scripts.md](scripts.md). The tells below apply to Arabic, Persian and English unless an entry says otherwise.
 
 ### TY-01 · One overused family for everything · P1 · scan render
 Inter, Roboto, Arial, Helvetica, Open Sans or the system stack for every role on the page; Geist untouched on a Next.js site.
@@ -69,13 +69,13 @@ Uppercase applied to sentences or paragraphs.
 **Sources:** IM GS
 
 ### TY-12 · Tight line height · P0 · render
-Body `line-height` below 1.4 for Latin, or below the script's floor (Arabic 1.6, Nastaliq 2.0, Devanagari 1.6, Thai 1.6, CJK 1.7).
+Body `line-height` below 1.4 for English, or below the Arabic-script floor (Arabic and Persian 1.6, Nastaliq 2.2).
 **Fix:** set line height per script with `:lang()` selectors (see `scripts-lang/`).
 **Sources:** IM GS AF T
 
 ### TY-13 · Tiny text · P1 · render
 Body text below 16px on phones, or controls and navigation below 13px.
-**Fix:** 16px minimum for body text, 14px minimum for UI text. Arabic and Indic scripts need one step larger than Latin at the same role.
+**Fix:** 16px minimum for body text, 14px minimum for UI text. Arabic and Persian need one step larger than English at the same role.
 **Sources:** IM GS T
 
 ### TY-14 · Monospace chrome · P1 · scan
@@ -86,7 +86,7 @@ Monospace used for body text, or all-caps mono labels on every element.
 **Sources:** GS AD FD
 
 ### TY-15 · Line length out of range · P1 · render
-Paragraph lines longer than about 75 characters (Latin), or measures that ignore the script (CJK reads comfortably at 30 to 40 characters, Arabic at 50 to 70).
+Paragraph lines longer than about 75 characters (Latin), or measures that ignore the script (Arabic and Persian read comfortably at 50 to 70 characters).
 **Fix:** a `max-inline-size` in `ch`, or per-script measures.
 **Sources:** IM T
 
@@ -101,7 +101,7 @@ A family named in CSS but never loaded, so a fallback font ships.
 **Sources:** AD T
 
 ### TY-18 · Typing-machine punctuation · P2 · scan
-Straight quotes, `...` instead of `…`, `--` instead of a dash, and the wrong quote style for the language: Arabic uses «», German „“, French « » with narrow no-break spaces, Japanese 「」.
+Straight quotes, `...` instead of `…`, `--` instead of a dash, and the wrong quote style for the language: Arabic and Persian use «», English uses curly quotes.
 **Fix:** use the language's own punctuation (see `scripts-lang/punctuation.md`).
 **Sources:** HM WG T
 

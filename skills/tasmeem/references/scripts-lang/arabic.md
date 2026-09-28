@@ -1,6 +1,6 @@
 # Arabic (ar), the first-class script
 
-Read this whenever a page contains Arabic, whatever the page's main language. Persian and Urdu share the script and add their own rules (see [persian-urdu.md](persian-urdu.md)). Bidirectional mechanics are covered in [bidi.md](bidi.md), numbers and dates in [numerals-dates.md](numerals-dates.md).
+Read this whenever a page contains Arabic, whatever the page's main language. Persian shares the script and adds its own rules (see [persian.md](persian.md)). Bidirectional mechanics are covered in [bidi.md](bidi.md), numbers and dates in [numerals-dates.md](numerals-dates.md).
 
 ## 1. Declare the language and direction
 
@@ -21,7 +21,7 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | **Kufi (geometric)** | interface, display, short labels, signage | long reading at small sizes |
 | **Ruqaa** | informal display, handwritten warmth | body, UI |
 | **Thuluth / Diwani** | ceremonial display, one word | anything that must be read quickly |
-| **Nastaliq** | Urdu (and Persian poetry) | Arabic-language UI |
+| **Nastaliq** | Persian poetry and literary display | Arabic-language UI, body text |
 
 **Families that work (open licences, on Google Fonts, all including Latin):**
 
@@ -35,7 +35,6 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | Reading Naskh | Noto Naskh Arabic, Scheherazade New, Markazi Text | Scheherazade places marks best; Markazi reads like a book face |
 | Classical Naskh | Amiri | book and literary feel, marks included |
 | Display | Reem Kufi, El Messiri, Lemonada, Qahiri, Kufam, Aref Ruqaa | display only |
-| Urdu | Noto Nastaliq Urdu, Gulzar | needs a much taller line height (SC-03) |
 
 **Commercial and regional families** (29LT, TypeTogether's Greta Arabic, Thmanyah's families, the Dubai font…): use them only with a licence that covers web embedding, and check the weights and the Latin partner.
 
@@ -74,7 +73,7 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 Put this reset at the base of every multilingual stylesheet:
 
 ```css
-:is(:lang(ar), :lang(fa), :lang(ur)) {
+:is(:lang(ar), :lang(fa)) {
   letter-spacing: 0;
   font-style: normal;
   text-transform: none;
@@ -175,7 +174,7 @@ This is the Arabic version of cream-and-serif. It is a costume, not an identity.
 
 - Build from the subject's real world instead: the product, its city, its materials, its people, its trade. A roastery in Riyadh has beans, roast colours, packaging, a neighbourhood. A law firm has paper, seals, a street.
 - Traditional pattern is **allowed** when it is the subject (a craft brand, a heritage institution) and is drawn with care from a real source, not taken from a stock pattern pack.
-- The same reflex exists for every culture (the Japanese torii, the Mexican papel picado, the Indian mandala). The same fix applies.
+- The same reflex exists for every culture (Persian design has its own, see persian.md). The same fix applies.
 
 ## 11. Images and calligraphy
 

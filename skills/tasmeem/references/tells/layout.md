@@ -109,7 +109,7 @@ Graph-paper lines or dot grids behind content, with no function.
 
 ### LA-22 · Buttons that wrap · P1 · render
 Button, navigation or breadcrumb labels breaking onto two lines at any tested width.
-**Fix:** shorten the label, widen the control, or restack the group. Test the longest language, since Arabic and German labels run longer than English.
+**Fix:** shorten the label, widen the control, or restack the group. Test the longest language, since Arabic and Persian labels often run wider than English.
 **Sources:** HM TS T
 
 ### LA-23 · Generated layout bugs · P1 · built

@@ -58,6 +58,12 @@ test('eval lesson: a display face at label size is TY-24', () => {
   assert.match(hits[0].message, /16px/)
 })
 
+test('Persian: machine-copy phrases and Arabic ي/ك inside Persian text', () => {
+  const text = '<html lang="fa" dir="rtl"><h1>راهکارهای نوآورانه برای کتاب‌فروشی</h1><p>نه تنها کتاب، بلکه شعر</p><p>کتاب هاي قديمي و شعر</p></html>'
+  const ids = scanDocs([{ file: 'fa.html', rel: 'fa.html', text }]).findings.map((f) => f.id)
+  for (const id of ['CP-02', 'CP-03', 'SC-09']) assert.ok(ids.includes(id), `expected ${id}`)
+})
+
 test('owner content files downgrade copy tells to advisory', () => {
   const res = scanDocs([{ file: 'content/home.json', rel: 'content/home.json', text: '{"intro": "هذا ليس مجرد متجر، بل حكاية"}' }])
   const f = res.findings.find((x) => x.id === 'CP-03')

@@ -1,6 +1,6 @@
 ---
 name: tasmeem
-description: "Arabic-first design skill that builds, audits and polishes interfaces that do not look AI-generated, in any language or script. Use when designing or redesigning a page, site, app screen or component; reviewing UI for AI slop, accessibility or polish; setting type, colour, layout or motion; building RTL, Arabic, Persian, Hebrew, CJK, Indic or other non-Latin interfaces; creating a brand identity, palette or design system; or generating real image assets (photos, textures, cutouts, icons) with Higgsfield or /rasm instead of gradients and placeholders. Verbs: audit, polish, redesign, study, brand, assets, motion, copy, document."
+description: "Arabic-first design skill that builds, audits and polishes interfaces that do not look AI-generated, in Arabic, Persian and English. Use when designing or redesigning a page, site, app screen or component; reviewing UI for AI slop, accessibility or polish; setting type, colour, layout or motion; building RTL Arabic or Persian interfaces, or bilingual pages with English; creating a brand identity, palette or design system; or generating real image assets (photos, textures, cutouts, icons) with Higgsfield or /rasm instead of gradients and placeholders. Verbs: audit, polish, redesign, study, brand, assets, motion, copy, document."
 license: MIT
 metadata:
   version: "0.1.0"
@@ -10,7 +10,7 @@ metadata:
 
 # tasmeem «تصميم»
 
-Design that reads as made, not generated: in Arabic first, and in every writing system. tasmeem decides a direction before it draws, sets type for the script actually on the page, authors real image assets instead of faking them with chrome, and proves the result with measurements before delivery.
+Design that reads as made, not generated: in Arabic first, then Persian and English. tasmeem decides a direction before it draws, sets type for the script actually on the page, authors real image assets instead of faking them with chrome, and proves the result with measurements before delivery.
 
 ## Setup (once per session)
 
@@ -24,7 +24,7 @@ It prints the project's `PRODUCT.md` and `DESIGN.md` (if they exist), the script
 
 1. **The owner's words are sacred.** Content they supplied is typeset, never rewritten. Copy rules apply to text you write.
 2. **Honesty.** No invented metrics, testimonials, logos, prices or capabilities. A missing fact becomes a labelled gap and goes on a list for the user (`references/core/honesty.md`).
-3. **The script decides the type.** Detect every script on the page. Load its guide from `references/scripts-lang/`. Never letter-space, italicise or case-transform Arabic, and never apply a Latin rule to another script (`SC-01`…`SC-19`).
+3. **The language decides the type.** Detect the languages on the page (Arabic, Persian, English). Load its guide from `references/scripts-lang/`. Never letter-space, italicise or case-transform Arabic, and never apply an English rule to Arabic or Persian (`SC-01`…`SC-19`).
 4. **Paint the material, code the meaning.** Images, textures and objects are authored assets (generated with provenance, or the owner's own). Every word, control and state is live code. Never ship gradients, glass or icon tiles where an image belongs, and never trust text rendered inside a generated image.
 5. **The brand wins over taste, never over access.** Documented brand choices override the taste tells, and are reported as brand exceptions. Nothing overrides contrast, focus, `lang`/`dir`, honesty or script correctness.
 6. **Evidence before delivery.** Every delivery ends with the gate (`references/core/gate.md`): measure, look, fix once, measure once more, report.
@@ -49,7 +49,7 @@ An explicit verb ("tasmeem audit src/app") wins. When the wording maps to two mo
 ## Load only what the work touches
 
 - **Before any new surface:** `references/core/direction.md`.
-- **For each script present:** `references/scripts-lang/<script>.md` (Arabic: `arabic.md`, always, whenever Arabic appears). Mixed directions: `bidi.md`. Numbers, dates and plurals: `numerals-dates.md`.
+- **For each language present:** `references/scripts-lang/arabic.md` (always, whenever Arabic or Persian appears), `persian.md`, `english.md`. Mixed directions: `bidi.md`. Numbers, dates and plurals: `numerals-dates.md`.
 - **Type, colour, layout, components, forms, the floor:** `references/craft/*.md`.
 - **Motion:** `references/motion/principles.md`, then `techniques.md`; `video.md` for produced motion (Higgsfield, Remotion).
 - **Assets:** `references/assets/pipeline.md`, `higgsfield.md` (setup and the cost gate), `prompts.md`, `rasm.md`, `provenance.md`.
@@ -99,7 +99,7 @@ Machine-made interfaces repeat the same moves. Avoid them unless the brand docum
   - content hidden until an animation runs (MO-06).
 - **Copy:**
   - vague aspiration (CP-01);
-  - buzzwords in any language (CP-02);
+  - buzzwords in English, Arabic or Persian (CP-02);
   - "not X, but Y" / «ليس مجرد… بل» (CP-03);
   - dash sprinkle (CP-05);
   - invented facts (CP-07);

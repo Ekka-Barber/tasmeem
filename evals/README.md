@@ -21,6 +21,10 @@ node evals/score.mjs                                        # scan + render ever
 - `score.mjs` runs tasmeem's `scan` and `render` on each `index.html`, writes `evals/results.md` (P0/P1/P2 before and after, per brief) and the screenshots at 1440×900 and 390×844.
 - Nothing is cherry-picked: every brief in `briefs/` is run and reported, including the ones where the baseline does well.
 
+## Status
+
+Only `ar-roastery` has been run (the pilot); its results are in `results.md` and the README. The other briefs are ready for later runs.
+
 ## Briefs
 
 | Id | Language | Surface | Trap it tests |
@@ -30,4 +34,3 @@ node evals/score.mjs                                        # scan + render ever
 | `ar-bindery` | Arabic | brand + home for a Jeddah bookbinding studio | brand from the subject's world, calligraphy in images |
 | `en-devtool` | English | landing page for a database migration CLI | purple gradient, bento, stat strip, fake terminal |
 | `fa-bookstore` | Persian | a poetry bookstore in Shiraz | ی/ک, ZWNJ, Nastaliq vs Naskh, Persian digits |
-| `ja-tea` | Japanese | a Kyoto tea house | kinsoku, CJK line height, the torii-and-sakura costume |

@@ -129,11 +129,9 @@ const safeName = (u) => u.replace(/^https?:\/\//, '').replace(/[^\w.-]+/g, '_').
 // ---------------------------------------------------------------------------
 // Runs inside the page. Must be self-contained.
 function pageAudit({ width, motion }) {
-  const R = {
-    arabic: /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/, hebrew: /[֐-׿]/,
-    cjk: /[぀-ヿ㐀-鿿가-힯]/, indic: /[ऀ-෿]/, thai: /[฀-໿က-႟ក-៿]/,
-  }
-  const FLOOR = { arabic: [1.6, 1.25], hebrew: [1.5, 1.15], cjk: [1.7, 1.3], indic: [1.6, 1.3], thai: [1.7, 1.35], latin: [1.35, 1.0] }
+  // Supported: Arabic and Persian (reported as "arabic", the script) and English (latin).
+  const R = { arabic: /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/ }
+  const FLOOR = { arabic: [1.6, 1.25], latin: [1.35, 1.0] }
   const findings = []
   const agg = new Map()
   const add = (id, severity, message, el, extra = {}) => {
@@ -203,9 +201,9 @@ function pageAudit({ width, motion }) {
     const script = scriptOf(own)
     scripts.add(script)
     allText += own.length
-    if (script === 'arabic' || script === 'hebrew') rtlText += own.length
+    if (script === 'arabic') rtlText += own.length
     if (/[0-9]/.test(own)) digits.western++
-    if (/[٠-٩۰-۹]/.test(own)) digits.arabic++
+    if (/[\u0660-\u0669\u06F0-\u06F9]/.test(own)) digits.arabic++
     const fs = parseFloat(cs.fontSize)
     const lh = cs.lineHeight === 'normal' ? null : parseFloat(cs.lineHeight) / fs
     const ls = cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing) / fs
@@ -214,7 +212,7 @@ function pageAudit({ width, motion }) {
     fonts[`${script}:${role}`] = fonts[`${script}:${role}`] || fam
     if (fontMarks < 60 && own.length > 2 && !el.hasAttribute('data-tsm-font')) { el.setAttribute('data-tsm-font', `${script}|${cs.fontFamily}|${sel(el)}`); fontMarks++ }
 
-    const joined = script === 'arabic' || script === 'indic'
+    const joined = script === 'arabic'
     if (joined && Math.abs(ls) > 0.001) add('SC-01', 'P0', `letter-spacing on ${script} text`, el)
     if (script !== 'latin' && /italic|oblique/.test(cs.fontStyle)) add('SC-02', 'P1', `italic on ${script} text`, el)
     if (script !== 'latin' && cs.textTransform !== 'none' && /uppercase|capitalize/.test(cs.textTransform)) add('SC-08', 'P2', `text-transform on ${script} text`, el)

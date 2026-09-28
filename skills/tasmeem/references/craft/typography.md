@@ -40,7 +40,7 @@ Define type as roles with tokens, then use the roles everywhere:
 ## Choosing faces
 
 1. From the subject's world: signage, print, engraving, handwriting, the tools of the trade.
-2. From the script's tradition: Naskh for Arabic reading, Kufi for Arabic display, Mincho or Gothic for Japanese…
+2. From the script's tradition: Naskh for Arabic and Persian reading, Kufi for Arabic display, Nastaliq for Persian poetry…
 3. Check the licence (web embedding), the coverage (every language and digit in use), the weights, and the rendering at 14px on a low-DPI screen.
 
 **Serif is not a default for "premium" or "editorial".** Use it when the subject calls for it: publishing, heritage, a literary voice. **Inter is not a default for "clean".** See TY-01 and TY-02.

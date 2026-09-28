@@ -100,12 +100,7 @@ Detailed lists live in `scripts/data/copy-tells.json` and in each `scripts-lang/
   - random tashkeel;
   - Latin `,` `?` `;` instead of «، ؟ ؛».
 - **English (en):** "In today's fast-paced world", "Whether you're X or Y", "Say goodbye to", "the ultimate", "Ready to…?", rhetorical questions in headings.
-- **Chinese (zh):** 赋能、打造、助力、一站式、全方位、颠覆、极致、无缝、闭环，以及 “不仅……更……” 的套话.
-- **Japanese (ja):** 「革新的な」「シームレスな」「〜を実現します」の連発、「〜することができます」の多用、カタカナ語の羅列、「！」の乱用.
-- **French (fr), Spanish (es), German (de):**
-  - buzzwords: *Découvrez / Libérez*, *Descubre / Potencia / lleva tu X al siguiente nivel*, *Entdecke / nahtlos / revolutionär*;
-  - wrong punctuation: missing ¡ ¿, missing French spacing before « ; : ! ? », English quotes in German;
-  - mixed formality: tu/vous, tú/usted, du/Sie.
-- **Hebrew (he), Persian (fa), Urdu (ur):**
-  - calques as in Arabic;
-  - for Persian, Arabic ي/ك typed instead of Persian ی/ک, and a missing ZWNJ (نیم‌فاصله). That one is a script defect, see SC-09.
+- **Persian (fa):**
+  - «راهکارهای نوآورانه»، «تجربه‌ای بی‌نظیر»، «به سادگی»، «فقط با یک کلیک»، «نسل جدید»;
+  - staged contrast «نه تنها… بلکه…»;
+  - Arabic ي/ك typed instead of Persian ی/ک, and a missing ZWNJ (نیم‌فاصله), which are script defects (SC-09).
