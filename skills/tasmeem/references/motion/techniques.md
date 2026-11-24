@@ -9,11 +9,12 @@
   --stagger: 60ms;
 }
 @media (prefers-reduced-motion: reduce) {
-  :root { --dur-press: 0ms; --dur-small: 0ms; --dur-menu: 0ms; --dur-dialog: 0ms; --dur-page: 0ms; --stagger: 0ms; }
+  /* Travel stops; feedback stays. Short fades and colour changes still tell the user something happened. */
+  :root { --dur-press: 0ms; --dur-menu: 120ms; --dur-dialog: 120ms; --dur-page: 0ms; --stagger: 0ms; --travel: 0px; }
 }
 ```
 
-Every animation uses the tokens, so one media query governs them all.
+Every animation uses the tokens, so one media query governs them all. Write movement as `translate: 0 var(--travel, 12px)` and scale as a token too, so reduced motion removes the travel and keeps the fade. Never answer reduced motion with `* { animation-duration: 0.01ms !important }` (MO-19).
 
 ## 2. Entrance that never hides content
 
@@ -76,7 +77,19 @@ For state changes and page navigation, with shared elements:
 
 In frameworks, use their View Transition APIs (React `<ViewTransition>`, Astro and Next integrations) when available. Give every shared element a unique name.
 
-## 5. Size changes without layout thrash
+## 5. Entering and leaving the top layer
+
+`@starting-style` gives an element a starting point when it appears, so a popover, dialog or toast can fade in from `display: none` without JavaScript:
+
+```css
+[popover] { opacity: 1; translate: 0 0; transition: opacity var(--dur-menu) var(--ease-out), translate var(--dur-menu) var(--ease-out), display var(--dur-menu) allow-discrete, overlay var(--dur-menu) allow-discrete; }
+[popover]:not(:popover-open) { opacity: 0; translate: 0 var(--travel, 6px); }
+@starting-style { [popover]:popover-open { opacity: 0; translate: 0 var(--travel, 6px); } }
+```
+
+Engines without it show the element at once, which is the right fallback. More native options, with their support, are in `craft/platform.md`.
+
+## 5b. Size changes without layout thrash
 
 - Height auto: `interpolate-size: allow-keywords` (where supported), or `grid-template-rows: 0fr → 1fr` with a `min-height: 0` child.
 - Reordering: FLIP (First, Last, Invert, Play) with `transform`, or View Transitions.
@@ -96,6 +109,13 @@ In frameworks, use their View Transition APIs (React `<ViewTransition>`, Astro a
 - `will-change` only just before an animation, and removed after it (MO-12).
 - Scroll logic through CSS timelines or `IntersectionObserver`, never scroll listeners that read layout (MO-17).
 - Large blurs and `backdrop-filter` are expensive on mobile. Test on a mid-range phone.
+
+## 7b. Choreography rules
+
+- **Skip the entrance on the first paint** of an app screen. Motion on load is for brand pages; a tool that animates every time it opens is slower every time (MO-15).
+- **Loops stop when they leave the screen** (an `IntersectionObserver` that pauses them) and under reduced motion.
+- **Gestures:** pointer events with `setPointerCapture`; ignore a second pointer unless the gesture is multi-touch; damp movement past a boundary instead of stopping dead; clean up on `pointercancel` and `lostpointercapture` (QA-17).
+- **Debug slowly.** Play the motion at a tenth of the speed (DevTools Animations panel) before judging the curve.
 
 ## 8. Testing motion
 

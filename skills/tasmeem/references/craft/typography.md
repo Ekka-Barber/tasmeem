@@ -19,7 +19,7 @@ Define type as roles with tokens, then use the roles everywhere:
   --size-h1:   clamp(2.25rem, 1.6rem + 3vw, 4.5rem);   /* cap display at about 6rem */
 
   --leading-body: 1.55;
-  --leading-tight: 1.15;
+  --leading-tight: 1.15;   /* Latin display; Arabic and Persian override it to 1.25 or more (scripts-lang/README.md) */
   --measure: 68ch;
 }
 .t-body  { font: 400 var(--size-body)/var(--leading-body) var(--font-body); }
@@ -28,7 +28,9 @@ Define type as roles with tokens, then use the roles everywhere:
 
 - **Scale.** A ratio of 1.2 to 1.25 for product UI and 1.25 to 1.414 for brand pages. The top steps may jump further.
 - **Weights.** Give each role a weight. Regular body, medium labels, one heavy display at most. Load only the weights you use.
-- **Fluid sizes.** Clamp each role between a mobile minimum and a desktop maximum. Test the extremes (TY-08, TY-22).
+- **Fluid sizes on brand pages, fixed steps in product UI.** On landing and editorial pages, clamp each role between a mobile minimum and a desktop maximum and test the extremes (TY-08, TY-22). In dense product UI (dashboards, tools, settings), use a fixed `rem` scale at a ratio of 1.125 to 1.2: a table header that changes size with the window reads as a bug.
+- **Light on dark.** Light text on a dark ground looks heavier and tighter. Add 0.05 to 0.1 of line height, drop one weight step, and keep Latin body tracking a touch open (Arabic stays at 0).
+- **Paragraph rhythm.** Space between paragraphs, or a first-line indent, never both. Leading grows with the measure: a long line needs more air than a short one.
 - **Script scoping.** Override the line height, tracking and size step per `:lang()` (see `scripts-lang/README.md`).
 
 ## Pairing
@@ -57,6 +59,6 @@ Define type as roles with tokens, then use the roles everywhere:
 ## Loading
 
 - `@font-face` with `font-display: swap` (body) or `optional` (display, when layout shift must be zero).
-- Fallback metrics: a local fallback face with `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override`, so the swap does not shift the layout.
+- Fallback metrics: a local fallback face with `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override`, so the swap does not shift the layout. `size-adjust` works in every engine; the three overrides are not in stable Safari yet (November 2026), so expect a small shift there.
 - Subset by `unicode-range` per script. Preload only the body weight of the primary script.
 - Self-host. Never link third-party font CSS in production unless its privacy and latency are accepted.

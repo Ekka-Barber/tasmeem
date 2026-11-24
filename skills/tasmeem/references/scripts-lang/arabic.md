@@ -42,8 +42,14 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 - **Arabic appears smaller.** At the same `font-size`, many Arabic faces look 10 to 20% smaller than their Latin partner. Measure, then fix with `size-adjust` in the Arabic `@font-face`, or with a `:lang(ar)` size step. Never guess.
 - **Weights under 400 break down** at interface sizes, because the thin strokes disappear. Keep 400 to 700 for UI and body text.
 - **Display faces stay large.** Geometric Kufi display faces simplify or drop dots at small sizes: in Kufam, a final ن at 16px reads as ر. Use display faces at 24px and up, and set labels, buttons, navigation and prices in the UI or body face (TY-24).
-- **Load the Arabic subset.** Use `unicode-range` for U+0600–06FF, U+0750–077F, U+08A0–08FF and U+FB50–FDFF, U+FE70–FEFF, and preload only the body weight.
-- **Check real coverage** of what you set: Arabic-Indic digits, «٪», «ﷺ» (U+FDFA), and the Saudi riyal sign (U+20C1, encoded in 2025; many fonts still lack it, so fall back to «ر.س» or an SVG).
+- **Load the Arabic subset.** Use `unicode-range: U+0600-06FF, U+0750-077F, U+0870-089F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC` (U+200C is the ZWNJ Persian needs; U+FEFF is the byte-order mark, not a letter), and preload only the body weight.
+- **Balance a bilingual family without spans.** Two `@font-face` rules under one family name, split by `unicode-range`, each with its own `size-adjust`, scale the Arabic and the Latin runs separately inside one string. `font-size-adjust` cannot do this, because it has no metric for Arabic.
+  ```css
+  @font-face { font-family: Body; src: url(/f/ar.woff2) format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-089F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC; size-adjust: 108%; }
+  @font-face { font-family: Body; src: url(/f/latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2013-2014, U+2018-201D; }
+  ```
+- **Variable or static.** On Google Fonts (November 2026): Noto Sans Arabic (wght 100–900, wdth 62.5–100), Readex Pro (wght 160–700), Vazirmatn, Alexandria and Noto Kufi Arabic (wght 100–900), Cairo (wght 200–1000), Rubik (300–900) are variable; IBM Plex Sans Arabic (100–700), Tajawal and Almarai are static, and Tajawal has no 600, Almarai only 300, 400, 700 and 800. Check the weights before writing the scale.
+- **Check real coverage** of what you set: Arabic-Indic digits, «٪», «ﷺ» (U+FDFA), and the Saudi riyal sign (U+20C1, Unicode 17.0, 2025). Most Arabic UI families do not have the riyal glyph yet (see `numerals-dates.md` § Currency for the pattern that adds it).
 
 ## 3. Size, line height and measure
 
@@ -56,7 +62,10 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 
 - Measure: 50 to 70 characters per line for reading.
 - Marks and descenders need space. Never clamp Arabic lines with `line-height: 1` or fixed control heights (SC-15).
-- `text-wrap: balance` works for Arabic headings; `text-wrap: pretty` for paragraphs.
+- `text-wrap: balance` works for Arabic headings (in every engine); `text-wrap: pretty` for paragraphs (not in Firefox; harmless there).
+- **Tailwind leading.** `leading-none` (1) clips Arabic everywhere; `leading-tight` (1.25) is the display floor and too tight for body text; `leading-snug` (1.375) is too tight for body. Use `leading-relaxed` (1.625) or more on Arabic body text, and remember that `text-sm` and `text-base` carry their own line height of about 1.43 and 1.5 (SC-03).
+- **Trimming the text box** (`text-box: trim-both cap alphabetic`) uses Latin metrics. On Arabic it can cut the marks above and the tails below: scope it to `:lang(en)`, or use the `text` edge (SC-15).
+- **Justification.** No browser stretches Arabic with kashida (`text-justify` has no kashida value), and no browser hyphenates Arabic. Justified Arabic therefore only widens the spaces: keep UI text at `start`.
 
 ## 4. Never do this to Arabic
 
@@ -66,6 +75,8 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | `font-style: italic` | Arabic has no italic; the browser slants it (SC-02) | weight or colour |
 | `text-transform` | the script has no case (SC-08) | nothing |
 | faux bold | the strokes smear | load real weights; `font-synthesis: none` |
+| `font-variant-ligatures: none`, `"liga" 0`, `"calt" 0` | the letters stop joining (SC-20) | leave ligatures on |
+| `::first-letter`, drop caps, a tag in the middle of a word | the letter is torn from its word (SC-21) | style whole words |
 | tatweel stretching (ـــ) | it breaks search and screen readers (SC-16) | the font's justification alternates, or nothing |
 | `text-align: justify` on UI text | rivers of space without kashida support | `start` |
 | generated images containing Arabic text | image models break letters (IG-08) | text in HTML or SVG |
@@ -83,7 +94,7 @@ Put this reset at the base of every multilingual stylesheet:
 
 ## 5. Emphasis and decoration
 
-- Emphasis comes from weight, colour and size. For underlines, use `text-underline-offset: 0.35em` and `text-decoration-skip-ink: auto`, so the line clears the descenders.
+- Emphasis comes from weight, colour and size. For underlines, use `text-underline-offset: 0.35em` so the line clears the descenders. Check `text-decoration-skip-ink: auto` by eye: on some faces it cuts the underline at every dot below the line, and `none` with a larger offset reads better.
 - **Tashkeel (diacritics)** only where a reader could misread a word, and on names; never scattered for ornament. Check that the font positions the marks and that the line height leaves them room.
 - **Numbers inside headings** follow the product's digit policy (see numerals-dates.md).
 
@@ -93,7 +104,7 @@ Put this reset at the base of every multilingual stylesheet:
 - No space before punctuation. When a closing mark must follow a space (for example after a Latin token), make that space a no-break space (U+00A0), so the mark never starts a line.
 - Add a space after «،» and «؛» when source text glues them to the next word.
 - In RTL, the browser mirrors parentheses and brackets automatically. Never type them reversed.
-- Percent: follow the locale: «٪» with Arabic-Indic digits, `%` with Western digits.
+- Percent: let `Intl.NumberFormat(locale, { style: 'percent' })` choose the sign. `ar-SA` with Western digits gives «50٪»; other locales give `%` with bidi marks. Do not hard-code either.
 - **Sacred text** (Qur'an, hadith, the shahada): never generate, paraphrase or restyle it. Use verified sources and a Qur'anic font (such as Amiri Quran), and keep it out of image generation entirely.
 
 ## 7. Direction and layout
@@ -114,7 +125,10 @@ Put this reset at the base of every multilingual stylesheet:
   - mirror arrows, chevrons, back and forward, send, reply, undo and redo, and indent;
   - never mirror clocks, play, checkmarks, logos, or icons containing letters or digits.
 - **Tables:** in RTL, text columns align start (right). Numeric columns may align end for comparison; decide once.
-- **Charts:** decide whether time runs right to left (natural for Arabic readers) or left to right (convention in finance), then document it. Never reverse an axis without reversing its data.
+- **Charts:** decide whether time runs right to left (natural for Arabic readers) or left to right (convention in finance), then document it. Never reverse an axis without reversing its data. In Recharts: keep the chart in a `dir="ltr"` wrapper, then set `reversed` on the X axis and `orientation="right"` on the Y axis for right-to-left time, pass the Arabic `fontFamily` to the ticks explicitly, and put an RLM (U+200F) before mixed tick labels.
+- **Script follows direction too** (SC-22). Logical CSS does not reach JavaScript: `scrollLeft`, `ArrowLeft`/`ArrowRight` handlers, swipe deltas and `side="left"` props must branch on the direction. Radix and shadcn read direction from `DirectionProvider`, not from the DOM: wrap the app in it (shadcn: `npx shadcn init --rtl`, or `"rtl": true` in `components.json`). shadcn flips icons with `rtl:rotate-180`, which turns asymmetric icons upside down; use `rtl:-scale-x-100`.
+- **Tailwind v4** writes logical CSS for `ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`, `text-start`, `border-s-*`, `rounded-s-*`, and for `space-x-*`. Physical utilities (`ml-*`, `pl-*`, `left-*`, `text-left`, `bg-left`, `origin-left`, `bg-linear-to-r`) need an `rtl:` pair or the logical form. In Tailwind v3, `space-x-*` is physical and needs `rtl:space-x-reverse`.
+- **Logical CSS that is safe now:** `float` and `clear: inline-start`, `inset-inline`, `border-start-start-radius`, `margin-inline`, `scroll-padding-inline`, `resize: inline`. **Not safe yet:** logical `background-position` (`x-start`), logical `caption-side`. Transforms, gradients (`to right`), masks and shadows have no logical form: write the RTL value under `:dir(rtl)`.
 
 ## 8. Forms
 
@@ -137,7 +151,7 @@ Put this reset at the base of every multilingual stylesheet:
 - **Gender.**
   - Decide the address strategy once. Either the conventional masculine generic, or neutral constructions («تسجيل الدخول», «أهلاً»); only use both forms where the product serves a known audience.
   - Keep agreement consistent: «كلمة المرور مطلوبة» / «رقم الهاتف مطلوب».
-- **Number and noun agreement.** Arabic has six plural categories: `zero`, `one`, `two`, `few` (3 to 10), `many` (11 to 99) and `other`. Use `Intl.PluralRules('ar')` and write every form:
+- **Number and noun agreement.** Arabic has six plural categories: `zero`, `one`, `two`, `few`, `many` and `other`. `few` and `many` follow the last two digits (n mod 100): 3–10, 103–110 and 1,003 are `few`; 11–99 and 111–199 are `many`; 100, 101 and 102 are `other`. Use `Intl.PluralRules('ar')` and write every form; never `count === 1 ? … : …` (QA-10):
   - «ملف واحد»
   - «ملفان»
   - «3 ملفات»
@@ -194,5 +208,8 @@ This is the Arabic version of cream-and-serif. It is a costume, not an identity.
 - [ ] One digit policy; inputs normalised; `Intl` with explicit `numberingSystem` and `calendar`.
 - [ ] Arabic punctuation; LTR tokens isolated; no reversed brackets.
 - [ ] Plurals through `Intl.PluralRules('ar')` with all six forms.
+- [ ] Ligatures on; no drop caps or mid-word tags on Arabic.
+- [ ] Number inputs accept «٠–٩» and «۰–۹»; no `type="number"` or `\d` on what users type.
+- [ ] Script respects direction: scrollers, arrow keys, swipes, popover sides; `DirectionProvider` around Radix or shadcn.
 - [ ] Copy free of calques and machine-copy tells; register consistent.
 - [ ] No generated Arabic text in images; logos in vector.

@@ -12,7 +12,7 @@ A read-only review of an existing surface. Nothing is edited until the user pick
 ```sh
 node <skill>/scripts/tasmeem.mjs scan <src> --json > .tasmeem/audit/scan.json
 node <skill>/scripts/tasmeem.mjs built <build-dir> --json > .tasmeem/audit/built.json          # if a static build exists
-node <skill>/scripts/tasmeem.mjs render <url> --widths 360,768,1024,1440 --json > .tasmeem/audit/render.json
+node <skill>/scripts/tasmeem.mjs render <url> --widths 360,390,768,1024,1440 --json > .tasmeem/audit/render.json
 node <skill>/scripts/tasmeem.mjs report .tasmeem/audit/*.json --design DESIGN.md > .tasmeem/audit/measured.md
 ```
 
@@ -33,7 +33,7 @@ One numbered list, deduplicated across the measured and judged findings, with P0
 
 ```
 # Audit · ‹target› · ‹date›
-Measured: scan ✓ · built ✓ · render ✓ (360/768/1024/1440, reduced-motion on/off)
+Measured: scan ✓ · built ✓ · render ✓ (360/390/768/1024/1440, reduced-motion on/off)
 Totals: P0 n · P1 n · P2 n · brand exceptions n
 
 | # | ID | Sev | Where | Finding | Fix | Evidence | Brand exception? |
@@ -45,6 +45,7 @@ Totals: P0 n · P1 n · P2 n · brand exceptions n
 - Group the findings by page when there are many. Give file and line where the scanner found them; route and selector for render findings.
 - Mark judged findings `eye`. Never present judgment as measurement.
 - End with the three highest-impact fixes, and what the page does well (to keep).
+- Add an **audit score**: each of five areas out of 4 (accessibility, performance, theming, responsive, writing systems), total out of 20, so the next audit shows the trend. Count measured findings only; judgment goes to `critique`.
 
 ## 5. Fix (only after the user picks)
 

@@ -102,3 +102,29 @@ Ornamental rules, bare `<hr>` lines between every section, and borders that repe
 Rows of equal dots posing as charts, gauges covered in tick marks, icons on metrics and redundant scales.
 **Fix:** draw the real data, or show the number in a sentence.
 **Sources:** GS
+
+### CM-21 · Dead controls · P0 · scan render
+Links with `href="#"`, buttons with empty handlers, navigation anchors that point at an id the page does not have, a form with nothing behind it. The page looks finished and does nothing.
+**Why:** generated pages draw the control first and never return to wire it. A visitor who clicks twice and gets nothing stops trusting everything else on the page.
+**Fix:** wire it, or remove it. A feature that does not exist yet is a labelled gap in the report, not a button.
+**Allowed:** never. This is an honesty failure (`core/honesty.md`), so a brand exception cannot cover it.
+**Sources:** AS IM
+
+### CM-22 · Hard offset shadow · P1 · scan
+A solid block shadow with no blur (`6px 6px 0 #000`) on cards and buttons: the neo-brutalist costume.
+**Why:** it is the reflex answer to "not the soft SaaS look", so it is now a default of its own.
+**Fix:** one elevation system. Use a border for structure and a soft shadow only for things that float.
+**Allowed:** when the brand's documented language is print or sticker-like and the offset is a token used everywhere.
+**Sources:** IM AD
+
+### CM-23 · The default dashboard shell · P1 · scan eye
+A sidebar, four equal stat cards with "+12% from last month", a chart titled "Overview", a filler activity feed, and a Name / Status / Date / Actions table.
+**Why:** it is the dashboard every model draws before reading what the user decides on this screen.
+**Fix:** build the screen around its one decision. Show a delta only with a named period and real data; cut the feed unless someone acts on it.
+**Allowed:** each part that the product's own data and tasks actually require.
+**Sources:** AS IM
+
+### CM-24 · A modal as the first thought · P2 · eye
+Every secondary task opens a dialog: edit, confirm, filter, details.
+**Fix:** edit in place, disclose progressively, or use a side sheet that keeps the context visible. Keep modals for decisions that must block.
+**Sources:** IM

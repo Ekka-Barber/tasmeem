@@ -15,7 +15,7 @@ For photographic or cinematic loops (a coffee pour, fabric in wind, a city at du
 
 For typographic, data-driven or templated motion (animated Arabic titles, a stats reel from real data, a branded intro), use Remotion (React components rendered to video):
 
-- Arabic works because text is real type: load the brand fonts, set `direction: rtl`, and never apply letter-spacing (SC-01).
+- Arabic works because text is real type: load the brand fonts, put `dir="rtl"` on the composition's root element (SC-24), and never apply letter-spacing (SC-01).
 - The same tokens (colours, durations, curves) as the site, so the video and the interface share one motion language.
 - Render at the target aspect ratios (16:9, 9:16, 1:1, 4:5). Every frame is reproducible from code.
 - If the Remotion skills are installed (`remotion-best-practices`, `remotion-create`, `remotion-render`), follow them for the API.

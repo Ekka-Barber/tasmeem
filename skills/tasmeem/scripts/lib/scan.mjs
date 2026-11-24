@@ -21,7 +21,8 @@ const REVEAL_SEL = /(reveal|fade-?in|fade-?up|slide-?up|animate-on-scroll|aos|sc
 export const DISPLAY_FACE = /^(kufam|reem kufi( fun| ink)?|lemonada|aref ruqaa( ink)?|rakkas|jomhuria|lalezar|katibeh|mirza|blaka( hollow| ink)?|marhey|qahiri|ruwudu|badeen display|oi|vibes|handjet|[\w -]*\bdisplay\b[\w -]*)$/i
 const LAYOUT_PROPS = /^(width|height|top|left|right|bottom|margin|margin-\w+|padding|padding-\w+|inset|inset-\w+|max-height|max-width|min-height|flex-basis)$/
 const PHYSICAL_PROPS = /^(margin-left|margin-right|padding-left|padding-right|border-left|border-right|border-left-\w+|border-right-\w+|left|right)$/
-const TW_PHYSICAL = /^-?(?:(?:m[lr]|p[lr]|border-[lr]|rounded-[lr]|rounded-[tb][lr]|left|right|space-x)-[\w./[\]-]+|text-left|text-right|float-left|float-right|border-[lr]|rounded-[lr])$/
+const TW_PHYSICAL = /^-?(?:(?:m[lr]|p[lr]|border-[lr]|rounded-[lr]|rounded-[tb][lr]|left|right|scroll-[mp][lr])-[\w./[\]-]+|text-left|text-right|float-left|float-right|clear-left|clear-right|border-[lr]|rounded-[lr]|bg-left|bg-right|origin-(?:top-|bottom-)?(?:left|right)|bg-(?:gradient|linear)-to-[lr]|slide-(?:in|out)-(?:from|to)-(?:left|right))$/
+const TW_PHYSICAL_V3 = /^-?space-x-[\w./[\]-]+$/
 
 /**
  * Scan source files.
@@ -49,6 +50,7 @@ export function scanDocs(input) {
     motion: /@keyframes|animation(-name)?\s*:|animation-timeline|framer-motion|motion\/react|\bgsap\b|\banimate-(?!none)[\w-]+|view-transition|\.animate\(\s*\[/.test(all),
     tokens: /(^|[\s{;])--[\w-]+\s*:/.test(all),
     langScopedReset: /:lang\((ar|fa)[^)]*\)[^{]*\{[^}]*letter-spacing\s*:\s*(0|normal)/s.test(all),
+    tailwind3: /@tailwind\s+(base|utilities)/.test(all),
   }
   sig.rtl = sig.rtl || sig.arabic
 
@@ -91,6 +93,11 @@ export function scanDocs(input) {
       tailwindRules(doc, sig, push)
     }
     if (isMarkup || isScript) jsRules(doc, sig, push)
+    if (isMarkup || isScript) {
+      const ladder = new Map()
+      for (const m of doc.code.matchAll(/\b(?:text|bg|border)-([a-z]+(?:-\d{2,3})?)\/(\d{1,3})\b/g)) { if (!ladder.has(m[1])) ladder.set(m[1], new Set()); ladder.get(m[1]).add(m[2]) }
+      for (const [c, set] of ladder) if (set.size >= 5) push(doc, 'CO-17', 'P2', undefined, `opacity ladder on ${c}: ${[...set].sort((a, b) => a - b).map((x) => '/' + x).join(' ')} (name the steps as tokens)`)
+    }
 
     // ---- Words ---------------------------------------------------------------
     copyRules(doc, sig, push, { isContent })
@@ -104,6 +111,7 @@ export function scanDocs(input) {
   // ---- Project-level ---------------------------------------------------------
   if (sig.motion && !sig.reducedMotion) push(null, 'MO-05', 'P0', undefined, 'motion exists but no prefers-reduced-motion path anywhere')
   if (/outline\s*:\s*(none|0)\b|\boutline-none\b/.test(all) && !sig.focusVisible) push(null, 'QA-02', 'P0', undefined, 'outline removed and no :focus-visible replacement anywhere')
+  if (sig.rtl && /from\s+["'](@radix-ui\/react-[\w-]+|radix-ui)["']/.test(all) && !/DirectionProvider|\bDirection\.Provider/.test(all)) push(null, 'SC-22', 'P1', undefined, 'Radix primitives in an RTL project with no DirectionProvider: keyboard navigation, sliders and portals stay LTR')
   if (iconLibs.size > 1) push(null, 'SY-05', 'P2', undefined, `several icon families: ${[...iconLibs].join(', ')}`)
   for (const [cls, n] of revealCounts) if (n >= 6) push(null, 'MO-01', 'P1', undefined, `the same entrance "${cls}" on ${n} elements`)
   const families = [...fontFamiliesUsed.keys()].filter((f) => !/^(var|inherit|initial|unset|serif|sans-serif|monospace|ui-|system)/.test(f))
@@ -116,7 +124,13 @@ export function scanDocs(input) {
     const faces = new Set([...fontFacesDeclared, ...[...all.matchAll(/font-family\s*:\s*["']?([^"';,}]+)["']?\s*;[^}]*src\s*:/g)].map((m) => m[1].trim().toLowerCase())])
     for (const f of families) if (!system.test(f) && !faces.has(f) && ![...faces].some((x) => x.includes(f) || f.includes(x))) push(null, 'TY-17', 'P1', undefined, `"${f}" is named in CSS but never loaded here (verify with render)`)
   }
+  if (sig.tokens && /<html\b|(^|[\s}])(html|body|:root)\s*\{/.test(all) && !/::selection|accent-color|caret-color|scrollbar-color|color-scheme/.test(all)) push(null, 'SY-08', 'P2', undefined, 'browser surfaces left unthemed: no ::selection, accent-color, caret-color, scrollbar-color or color-scheme anywhere')
   if (sig.tokens && colorLiteralFiles > 0) push(null, 'CO-16', 'P1', undefined, `${colorLiteralFiles} non-token file(s) with many raw colour literals`)
+
+  // Template stack: one tell is a choice; six different ones in a file is the template.
+  const stack = new Map()
+  for (const f of out) if (f.file && f.severity !== 'P2' && /^(CO|TY|LA|CM|MO)-/.test(f.id)) { if (!stack.has(f.file)) stack.set(f.file, new Set()); stack.get(f.file).add(f.id) }
+  for (const [file, set] of stack) if (set.size >= 6) out.push(finding('SY-10', 'P1', { file }, `template stack: ${set.size} different taste tells in one file (${[...set].sort().join(' ')}). Rework the structure, not the items one by one`, { channel: 'scan' }))
 
   return { findings: aggregate(out), meta: { signals: sig, fontFamilies: families } }
 }
@@ -182,7 +196,8 @@ function cssRules(doc, parsed, sig, push, acc) {
         const n = parseFloat(v)
         const unitless = /^[\d.]+$/.test(v.trim())
         if (unitless && n < 1.35 && BODY_SEL.test(sel) && !HEADING_SEL.test(sel)) push(doc, 'TY-12', 'P0', L, `body line-height ${v}`, sel)
-        if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.5 && !HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic line-height ${v} (floor 1.6 for body)`, sel)
+        if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.6 && !HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic line-height ${v} (floor 1.6 for body)`, sel)
+        if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.25 && HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic heading line-height ${v} (floor 1.25 for display)`, sel)
       }
       if (d.prop === 'text-align' && vl === 'justify') push(doc, 'TY-16', 'P2', L, sig.arabic ? 'justified text (Arabic without kashida support leaves rivers)' : 'justified text', sel)
       if (/text-stroke/.test(d.prop) && /transparent/.test(decl.color || decl['-webkit-text-fill-color'] || '')) push(doc, 'TY-23', 'P2', L, 'hollow text', sel)
@@ -204,6 +219,12 @@ function cssRules(doc, parsed, sig, push, acc) {
       if (d.prop === 'border-radius') { const px = toPx(v.split(/\s+/)[0]); if (px !== null && px >= 24 && px < 999 && /card|panel|box|tile|section|container/.test(sel)) push(doc, 'CM-02', 'P2', L, `radius ${v} on a content box`, sel) }
       if (d.prop === 'box-shadow' && /\b1px solid\b/.test(decl.border || '') && maxBlur(v) >= 24) push(doc, 'CM-06', 'P2', L, 'hairline border plus wide shadow', sel)
       if (d.prop === 'will-change' && !/auto/.test(vl)) push(doc, 'MO-12', 'P2', L, 'will-change left on at rest', sel)
+      if (d.prop === 'box-shadow' && hardOffsetShadow(vl)) push(doc, 'CM-22', 'P1', L, 'hard offset shadow with no blur', v)
+      if (d.prop === 'font-family' && /^["']?(impact|arial black|haettenschweiler)\b/i.test(v.trim())) push(doc, 'TY-25', 'P1', L, 'system display face as the brand voice', v)
+      if (d.prop === 'font-size' && /(^|[\s,>+~])(input|select|textarea)(?=$|[\s,:.[>+~])/.test(sel)) { const px = toPx(v); if (px !== null && px < 16) push(doc, 'QA-19', 'P1', L, `form control at ${px}px (iOS zooms the page on focus below 16px)`, sel) }
+      if (d.prop === 'position' && vl === 'fixed' && /^0(px)?$/.test((decl.bottom || decl['inset-block-end'] || '').trim()) && !/safe-area-inset/.test(doc.text)) push(doc, 'QA-18', 'P1', L, 'fixed bottom bar with no safe-area inset anywhere in this file', sel)
+      if (/^padding(-block|-top|-bottom)?$/.test(d.prop) && /(^|[\s,.#>])(section|\.?[\w-]*(section|hero|band|block)[\w-]*)(?=$|[\s,:.[>+~])/i.test(sel) && !rule.at.some((a) => /^@media/.test(a)) && !/@media[^{]*max-width/.test(doc.text)) { const px = toPx(v.split(/\s+/)[0]); if (px !== null && px >= 96) push(doc, 'LA-25', 'P2', L, `section padding ${v} with no smaller step for phones`, sel) }
+      if (d.prop === 'clip-path' && /polygon\(/.test(vl) && (vl.match(/,/g) || []).length >= 8) push(doc, 'IG-13', 'P2', L, 'many-point clip-path drawing a shape (use real artwork)', sel)
 
       // Motion
       if (/^transition(-property)?$/.test(d.prop) && /(^|[\s,])all\b/.test(vl)) push(doc, 'MO-03', 'P1', L, 'transition: all', sel)
@@ -214,6 +235,8 @@ function cssRules(doc, parsed, sig, push, acc) {
         if (ms.some((x) => x > 400) && !inReduce) push(doc, 'MO-09', 'P2', L, `UI transition ${Math.max(...ms)}ms`, sel)
         if (/\bease-in\b(?!-)/.test(vl)) push(doc, 'MO-09', 'P2', L, 'ease-in on a transition (use ease-out for responses)', sel)
       }
+      if (/^transition(-property)?$/.test(d.prop) && /\boutline\b/.test(vl)) push(doc, 'MO-20', 'P2', L, 'outline is transitioned: the focus ring fades in instead of appearing', sel)
+      if (inReduce && /\*/.test(sel) && /^(animation|transition)(-duration)?$/.test(d.prop) && /(^|\s)0?\.0+1m?s|(^|\s)1ms/.test(vl)) push(doc, 'MO-19', 'P2', L, 'reduced motion handled as a global kill switch (keep opacity and colour feedback)', sel)
       if (inKeyframes && LAYOUT_PROPS.test(d.prop)) push(doc, 'MO-04', 'P1', L, `keyframes animate ${d.prop}`, rule.at.find((a) => /keyframes/.test(a)))
       if (inKeyframes && d.prop === 'transform' && /scale\(\s*0\s*\)/.test(vl)) push(doc, 'MO-10', 'P2', L, 'animates from scale(0)', rule.at.find((a) => /keyframes/.test(a)))
       if (d.prop === 'opacity' && parseFloat(v) === 0 && REVEAL_SEL.test(sel) && !/:not\(|\[data-motion|\.motion-ok|\.js-motion|:hover|:focus/.test(sel) && !inReduce) push(doc, 'MO-06', 'P0', L, 'content hidden by default until a reveal runs', sel)
@@ -222,6 +245,19 @@ function cssRules(doc, parsed, sig, push, acc) {
       if (sig.rtl && PHYSICAL_PROPS.test(d.prop) && !/^(0|auto|0px)$/.test(vl.trim()) && !langScoped) push(doc, 'SC-05', 'P1', L, `physical ${d.prop} in an RTL project (use the logical property)`, sel)
       if (sig.rtl && d.prop === 'text-align' && /^(left|right)$/.test(vl) && !langScoped) push(doc, 'SC-05', 'P1', L, `text-align: ${vl} in an RTL project (use start/end)`, sel)
       if (sig.rtl && d.prop === 'float' && /^(left|right)$/.test(vl)) push(doc, 'SC-05', 'P1', L, `float: ${vl} in an RTL project`, sel)
+      const latinOnly = /:lang\(en|\b(code|pre|kbd|samp)\b/.test(sel)
+      if (sig.arabic && !latinOnly && ((d.prop === 'font-variant-ligatures' && /none|no-common-ligatures|no-contextual/.test(vl)) || (d.prop === 'font-feature-settings' && /["'](liga|calt|rlig|ccmp)["']\s*(0|off)/.test(vl)))) push(doc, 'SC-20', 'P0', L, `ligatures disabled (${d.prop}: ${v}): Arabic letters stop joining`, sel)
+      if (sig.arabic && !latinOnly && (/::?first-letter/.test(sel) || d.prop === 'initial-letter')) push(doc, 'SC-21', 'P1', L, 'first-letter styling can reach Arabic, where the first letter is joined to the rest of the word', sel)
+      if (sig.arabic && !latinOnly && /^text-box(-trim|-edge)?$/.test(d.prop) && !/\btext\b/.test(decl['text-box-edge'] || (d.prop === 'text-box' ? vl : ''))) push(doc, 'SC-15', 'P1', L, 'text-box trimming to cap or alphabetic edges can clip Arabic marks (scope it to :lang(en), or use the text edge)', sel)
+      if (d.prop === 'direction' && vl === 'rtl') push(doc, 'SC-24', 'P2', L, 'direction set in CSS: put dir="rtl" in the markup, where it survives without styles', sel)
+      if (d.prop === 'unicode-bidi' && /bidi-override/.test(vl)) push(doc, 'SC-24', 'P2', L, 'bidi-override forces the visual order: isolate instead (unicode-bidi: isolate, <bdi>, dir="auto")', sel)
+      if (sig.rtl && !langScoped) {
+        if (/^(background-position(-x)?|mask-position|object-position)$/.test(d.prop) && /\b(left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, `${d.prop}: ${v} in an RTL project (mirror it under :dir(rtl))`, sel)
+        if (d.prop === 'transform-origin' && /\b(left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, `transform-origin: ${v} in an RTL project`, sel)
+        if (/^border-(top|bottom)-(left|right)-radius$/.test(d.prop) && !/^0/.test(vl)) push(doc, 'SC-05', 'P1', L, `${d.prop} in an RTL project (use border-start-start-radius and its siblings)`, sel)
+        if (/^(mask|-webkit-mask|mask-image|-webkit-mask-image|background|background-image)$/.test(d.prop) && /linear-gradient\(\s*to (left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, 'a horizontal gradient or fade pinned to one side in an RTL project', sel)
+        if ((d.prop === 'clear') && /^(left|right)$/.test(vl)) push(doc, 'SC-05', 'P1', L, `clear: ${vl} in an RTL project (use inline-start)`, sel)
+      }
       if (sig.arabic && d.prop === 'text-transform' && /uppercase|capitalize/.test(vl) && !/:lang\(en/.test(sel)) push(doc, 'SC-08', 'P2', L, `text-transform: ${vl} may reach Arabic labels`, sel)
     }
   }
@@ -242,6 +278,25 @@ function markupRules(doc, sig, push, acc) {
   for (const m of t.matchAll(/<meta[^>]+name=["']generator["'][^>]*>|(made|built) with (v0|lovable|bolt|framer|webflow|wix)/gi)) push(doc, 'IG-11', 'P1', L(m.index), 'generator fingerprint', m[0])
   for (const m of t.matchAll(/<(div|span|li|p)\b[^>]*\bonClick\s*=/g)) push(doc, 'QA-09', 'P1', L(m.index), `clickable <${m[1]}> (use <button> or <a>)`)
   for (const m of t.matchAll(/onPaste\s*=\s*\{[^}]*preventDefault/g)) push(doc, 'QA-15', 'P1', L(m.index), 'paste blocked')
+  // Dead controls: links and handlers that go nowhere (test doubles and stories are not the product)
+  const isFixture = /(__tests__|__mocks__|\.test\.|\.spec\.|\.stories\.|(^|\/)(tests?|e2e|stories)\/)/.test(doc.rel)
+  if (!isFixture) for (const m of t.matchAll(/<a\b[^>]*\bhref\s*=\s*(?:["'](?:#|javascript:[^"']*)?["']|\{\s*["'`]#?["'`]\s*\})[^>]*>/gi)) push(doc, 'CM-21', 'P0', L(m.index), 'dead link (href goes nowhere): wire it or remove it', m[0].slice(0, 90))
+  if (!isFixture) for (const m of t.matchAll(/\bon(?:Click|Submit|Change)\s*=\s*\{\s*\(\s*\w*\s*\)\s*=>\s*(?:\{\s*\}|undefined|null|void 0)\s*\}/g)) push(doc, 'CM-21', 'P0', L(m.index), 'empty handler: the control does nothing', m[0])
+  if (doc.ext === '.html' || doc.ext === '.htm') {
+    const idsHere = new Set([...t.matchAll(/\b(?:id|name)\s*=\s*["']([^"']+)["']/g)].map((m) => m[1]))
+    for (const m of t.matchAll(/<a\b[^>]*\bhref\s*=\s*["']#([^"']+)["']/gi)) if (!idsHere.has(m[1]) && m[1] !== 'top') push(doc, 'CM-21', 'P1', L(m.index), `anchor #${m[1]} has no target on this page`)
+  }
+  // Drawn stand-ins for imagery
+  for (const m of t.matchAll(/<feTurbulence\b/g)) push(doc, 'IG-13', 'P1', L(m.index), 'SVG noise filter as fake grain (use a real texture plate or none)')
+  for (const m of t.matchAll(/<svg\b[\s\S]*?<\/svg>/g)) { const n = (m[0].match(/<(path|circle|rect|ellipse|polygon|polyline|line)\b/g) || []).length; if (n >= 24 && !/<text\b|<title\b|role=["']img["']/.test(m[0])) push(doc, 'IG-07', 'P2', L(m.index), `an inline SVG assembled from ${n} shapes: confirm it is not standing in for a photograph`) }
+  for (const m of t.matchAll(/import\s*\{([^}]*)\}\s*from\s*["'](?:lucide-react|react-icons[^"']*|@heroicons[^"']*|@phosphor-icons[^"']*|@tabler\/icons[^"']*)["']/g)) { const hit = m[1].match(/\b(Sparkles?|Zap|Wand2?|WandSparkles|Bot|Rocket|BrainCircuit)\b/); if (hit) push(doc, 'IG-14', 'P2', L(m.index), `the reflex "AI feature" icon ${hit[1]}: use an icon that names the feature, or none`) }
+  for (const m of t.matchAll(/typed\.js|react-type-animation|typewriter-effect|<Type(Animation|writer)\b/g)) push(doc, 'MO-21', 'P2', L(m.index), 'typed-out headline')
+  if (/\b(onMouseDown|mousedown)\b/.test(t) && /\b(onMouseMove|mousemove)\b/.test(t) && !/\b(onPointerDown|pointerdown|onTouchStart|touchstart)\b/.test(t)) push(doc, 'QA-17', 'P1', L(t.search(/\b(onMouseDown|mousedown)\b/)), 'mouse-only drag: no pointer or touch events in this file')
+  if (sig.arabic) {
+    for (const m of t.matchAll(/[\u0620-\u064A\u0671-\u06D3][\u064B-\u0652]*<\/?(span|b|strong|em|mark|i|u|a)\b[^>]*>[\u0620-\u064A\u0671-\u06D3]/g)) push(doc, 'SC-21', 'P2', L(m.index), 'a tag splits an Arabic word: check the letters still join on each side', m[0])
+    for (const m of t.matchAll(/<input\b[^>]*\btype\s*=\s*["']number["'][^>]*>/gi)) push(doc, 'SC-23', 'P1', L(m.index), 'type="number" in an Arabic-script project: use a text input with inputmode="decimal" and normalise both digit ranges', m[0].slice(0, 90))
+    for (const m of t.matchAll(/\bpattern\s*=\s*["'{][^"'}]*\\d/g)) push(doc, 'SC-23', 'P1', L(m.index), 'a \\d pattern rejects Arabic-Indic digits: normalise first, or use [0-9٠-٩۰-۹]', m[0].slice(0, 90))
+  }
   // Headline with one accented word (SD5 / TY-04)
   for (const m of t.matchAll(/<h([1-2])\b[^>]*>((?:(?!<\/h\1>)[\s\S]){0,400})<\/h\1>/g)) {
     const inner = m[2]
@@ -296,6 +351,11 @@ function tailwindRules(doc, sig, push) {
     if (has(/\bborder-[lrse]-(2|4|8)\b/) && has(/\bborder-[lrse]?-?(\w+)-(300|400|500|600)\b/)) push(doc, 'CM-04', 'P1', line, 'side-stripe accent (Tailwind)', cls)
     if (has(/\brounded-(lg|xl|2xl)\b/) && has(/\bbg-\w+-(50|100)\b|\bbg-\w+-500\/10\b/) && has(/\b(p-2|p-2\.5|p-3)\b/) && has(/\b(w|h|size)-(8|10|12)\b/)) push(doc, 'CM-05', 'P1', line, 'icon in a tinted chip', cls)
     if (has(/\brounded-(2xl|3xl)\b/) && has(/\bshadow-(lg|xl|2xl)\b/)) push(doc, 'CM-02', 'P2', line, 'rounded-2xl + shadow-lg', cls)
+    if (has(/\bshadow-\[-?[1-9]\d*px_-?[1-9]\d*px_0(px)?_/)) push(doc, 'CM-22', 'P1', line, 'hard offset shadow with no blur (Tailwind)', cls)
+    if (has(/(^|\s)fixed(\s|$)/) && has(/(^|\s)bottom-0(\s|$)/) && !/safe-area-inset|pb-safe/.test(t)) push(doc, 'QA-18', 'P1', line, 'fixed bottom bar with no safe-area inset anywhere in this file', cls)
+    if (/^<(input|select|textarea)\b/i.test(t.slice(t.lastIndexOf('<', m.index), m.index)) && has(/(^|\s)text-(xs|sm)(\s|$)/)) push(doc, 'QA-19', 'P1', line, 'form control below 16px (iOS zooms the page on focus)', cls)
+    { const cols = [...cls.matchAll(/(?:^|\s)((?:sm|md|lg|xl|2xl):)?grid-cols-(\d+)/g)].map((x) => ({ bp: x[1], n: +x[2] })); const stepped = cols.filter((c) => c.bp); if (stepped.length === 1 && stepped[0].n >= 3 && cols.every((c) => c.bp || c.n === 1)) push(doc, 'LA-24', 'P2', line, `grid jumps from one column to ${stepped[0].n} with no middle step`, cls) }
+    if (has(/(^|\s)py-(24|28|32|36|40|48)(\s|$)/) && !has(/\b(sm|md|lg):py-/)) push(doc, 'LA-25', 'P2', line, 'desktop section padding with no smaller step for phones', cls)
     if (has(/\btransition-all\b/)) push(doc, 'MO-03', 'P1', line, 'transition-all', cls)
     if (has(/\bhover:scale-1(05|10)\b/)) push(doc, 'MO-07', 'P2', line, 'hover scale', cls)
     if (has(/\banimate-(pulse|ping)\b/) && has(/\brounded-full\b/) && has(/\b(w|h|size)-(1|1\.5|2|2\.5|3)\b/)) push(doc, 'MO-08', 'P2', line, 'pulsing dot', cls)
@@ -303,12 +363,18 @@ function tailwindRules(doc, sig, push) {
     if (has(/\boutline-none\b/) && !has(/focus-visible:/)) push(doc, 'QA-02', 'P1', line, 'outline-none without focus-visible here', cls)
     if (has(/\bz-\[?(999|9999|99999)\]?/)) push(doc, 'SY-04', 'P2', line, 'z-index 999+', cls)
     if (sig.arabic && has(/\btracking-(tight|tighter|wide|wider|widest|\[)/) && SCRIPTS.arabic.test(t.slice(m.index, m.index + 400))) push(doc, 'SC-01', 'P0', line, 'tracking utility next to Arabic text', cls)
+    if (sig.arabic && has(/(^|\s)leading-(none|tight|snug|\[1(\.[0-4]\d*)?\])(\s|$)/) && SCRIPTS.arabic.test(t.slice(m.index, m.index + 400))) {
+      const tag = (t.slice(t.lastIndexOf('<', m.index), m.index).match(/^<([\w.]+)/) || [])[1] || ''
+      const display = /^h[1-4]$/i.test(tag) || /(^|\s)text-(lg|[2-9]?xl|\[(2\d|[3-9]\d|1\d\d)px\])(\s|$)/.test(cls)
+      if (has(/(^|\s)leading-(none|\[1(\.[01]\d*)?\])(\s|$)/) || !display) push(doc, 'SC-03', 'P1', line, `tight leading utility next to Arabic ${display ? 'display' : 'body'} text (floor ${display ? '1.25' : '1.6'}; confirm with render)`, cls, { confirm: 'render' })
+    }
     if (sig.arabic && has(/(^|\s)italic\b/) && SCRIPTS.arabic.test(t.slice(m.index, m.index + 300))) push(doc, 'SC-02', 'P1', line, 'italic next to Arabic text', cls)
     if (sig.rtl) {
       const phys = cls.split(/\s+/).filter((tok) => {
         const parts = tok.split(':')
         if (parts.slice(0, -1).some((v) => v === 'rtl' || v === 'ltr')) return false
-        return TW_PHYSICAL.test(parts[parts.length - 1])
+        const u = parts[parts.length - 1]
+        return TW_PHYSICAL.test(u) || (sig.tailwind3 && TW_PHYSICAL_V3.test(u))
       })
       if (phys.length) push(doc, 'SC-05', 'P1', line, `physical utilities in an RTL project: ${[...new Set(phys)].slice(0, 4).join(' ')}`, cls)
     }
@@ -322,6 +388,13 @@ function jsRules(doc, sig, push) {
   for (const m of t.matchAll(/bounce:\s*0?\.[1-9]|type:\s*["']spring["'][^}]*damping:\s*[1-9]\b(?!\d)|ease:\s*["'](backOut|backInOut|anticipate)["']|elastic\.|back\.out|bounce\.out/g)) push(doc, 'MO-02', 'P1', L(m.index), 'overshooting motion', m[0])
   for (const m of t.matchAll(/addEventListener\(\s*["']scroll["'][^)]*\)/g)) if (!/passive\s*:\s*true/.test(m[0]) || /getBoundingClientRect|offsetTop|scrollTop/.test(t.slice(m.index, m.index + 600))) push(doc, 'MO-17', 'P1', L(m.index), 'scroll listener doing work on the main thread (prefer CSS scroll timelines or IntersectionObserver)')
   for (const m of t.matchAll(/getMonth\(\)\s*\+\s*1|["'`]\s*\$\s*["'`]\s*\+|\+\s*["'`]\s*(SAR|\u0631\.\u0633|USD|EUR)\s*["'`]/g)) push(doc, 'QA-10', 'P1', L(m.index), 'hand-built date or currency (use Intl)', m[0])
+  if (sig.rtl && !/isRtl|isRTL|direction\b|\bdir\s*===|:dir\(|useDirection|useLocale|getComputedStyle/.test(t)) {
+    for (const m of t.matchAll(/\bscrollLeft\b|\bscrollBy\(\s*\{\s*left|["'`]Arrow(Left|Right)["'`]/g)) push(doc, 'SC-22', 'P1', L(m.index), `${m[0].replace(/["'`]/g, '')} with no direction check: in RTL, left is forward`)
+    for (const m of t.matchAll(/\b(side|placement|align|anchor|position)\s*=\s*["'{]["']?(left|right)["']?/g)) push(doc, 'SC-22', 'P2', L(m.index), `${m[1]}="${m[2]}" is fixed to one side: right in an RTL-only app, wrong once it also ships LTR (use start/end, or branch on direction)`, m[0])
+  }
+  for (const m of t.matchAll(/\.toLocale(Date|Time)?String\(\s*\)|new Intl\.(NumberFormat|DateTimeFormat|PluralRules|RelativeTimeFormat|ListFormat)\(\s*\)/g)) push(doc, 'QA-10', 'P1', L(m.index), 'formatting with no locale: the server and each browser pick different digits and calendars', m[0])
+  for (const m of t.matchAll(/\.toFixed\(\s*2\s*\)/g)) if (/price|amount|total|currency|SAR|KWD|BHD|OMR|JOD|riyal|\u0631\.\u0633|\u0631\u064A\u0627\u0644/i.test(t.slice(Math.max(0, m.index - 120), m.index + 60))) push(doc, 'QA-10', 'P2', L(m.index), 'toFixed(2) on money: KWD, BHD, OMR, JOD and others use 3 decimals (use Intl currency format)', m[0])
+  if (sig.arabic) for (const m of t.matchAll(/\b(count|n|num|length|total|qty|quantity|items?|days?)\s*===?\s*1\s*\?/g)) if (SCRIPTS.arabic.test(t.slice(m.index, m.index + 160))) push(doc, 'QA-10', 'P1', L(m.index), 'hand-built plural: Arabic has six forms (use Intl.PluralRules)', m[0])
   for (const m of t.matchAll(/\b(react-countup|CountUp|useCountUp)\b/g)) push(doc, 'MO-11', 'P2', L(m.index), 'count-up numbers')
 }
 
@@ -344,7 +417,7 @@ function copyRules(doc, sig, push, { isContent }) {
         for (const p of phrases) {
           const hit = p.includes('.*') ? new RegExp(p, 'i').test(norm) : norm.includes(isAr ? stripTashkeel(p) : p)
           if (!hit) continue
-          const base = id === 'CP-08' ? 'P0' : id === 'CP-06' || id === 'CP-09' || id === 'CP-16' ? 'P2' : 'P1'
+          const base = id === 'CP-08' ? 'P0' : id === 'CP-06' || id === 'CP-09' || id === 'CP-16' || id === 'CP-18' || id === 'LA-26' ? 'P2' : 'P1'
           push(doc, id, sev(base), s.line, `"${p}"${tag}`, text.slice(0, 80))
           break
         }
@@ -359,7 +432,9 @@ function copyRules(doc, sig, push, { isContent }) {
     if (/[0-9]/.test(text) && /[\u0660-\u0669\u06F0-\u06F9]/.test(text)) push(doc, 'SC-07', 'P1', s.line, 'Western and Arabic-Indic digits in one string', text.slice(0, 60))
     if (/\b(\d{1,3}(,\d{3})+|\d+(\.\d+)?[kKmM]\+?)\s+(users|customers|teams|companies|downloads|clients)\b|\b99\.9+%|\b\d+(\.\d)?\/5\b|\btrusted by\b|\u0623\u0643\u062B\u0631 \u0645\u0646\s+[\d\u0660-\u0669]+\s+(\u0639\u0645\u064A\u0644|\u0645\u0633\u062A\u062E\u062F\u0645)/i.test(text)) push(doc, 'CP-07', owner ? 'P2' : 'P1', s.line, 'a metric or social proof: confirm the owner supplied it', text.slice(0, 80))
   }
-  if (dashes >= 3 && !owner) push(doc, 'CP-05', 'P1', firstDash, `${dashes} em dashes in interface strings`)
+  for (const s of strings) if (/[+\-\u2212\u2191\u2193]\s?\d+(\.\d+)?%\s+(this|vs\.?|from|since|than)\s+(last\s+|the\s+)?(week|month|quarter|year|yesterday)/i.test(s.text)) push(doc, 'CM-23', owner ? 'P2' : 'P1', s.line, 'a stat-card delta: confirm the number and its period are real data', s.text.slice(0, 60))
+  // A few dashes are punctuation; a dash in most sentences is the machine cadence.
+  if (dashes >= 3 && !owner) push(doc, 'CP-05', dashes >= 8 ? 'P1' : 'P2', firstDash, `${dashes} em dashes in interface strings`)
 }
 
 // ---- helpers ---------------------------------------------------------------
@@ -433,6 +508,13 @@ function glowShadow(v) {
     const blur = nums[2] ? parseFloat(nums[2]) : nums.length === 1 ? parseFloat(nums[0]) : 0
     const c = firstColor(part)
     if (blur >= 16 && c && c.a >= 0.25 && rgbToOklch(c).C >= 0.1) return true
+  }
+  return false
+}
+function hardOffsetShadow(v) {
+  for (const part of v.split(/,(?![^(]*\))/)) {
+    const m = part.trim().match(/^(-?\d*\.?\d+)px\s+(-?\d*\.?\d+)px\s+0(?:px)?(?:\s+-?\d*\.?\d+(?:px)?)?(?:\s+\S|$)/)
+    if (m && Math.abs(parseFloat(m[1])) >= 3 && Math.abs(parseFloat(m[2])) >= 3) return true
   }
   return false
 }

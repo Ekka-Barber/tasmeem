@@ -16,7 +16,10 @@ OKLCH separates lightness (L), chroma (C) and hue (H), so ramps stay perceptuall
 }
 ```
 
-- **Tint the neutrals** 0.005 to 0.015 chroma toward the brand hue, not toward "warm" or "cool" by habit.
+- **Tint the neutrals when it ties the system together:** 0.005 to 0.015 chroma toward the brand hue, not toward "warm" or "cool" by habit. A true neutral grey is a valid choice for tools and data, where tint would read as a cast.
+- **Ramps lose chroma at the ends.** Near L 0.15 and L 0.97, high chroma falls out of gamut and looks dirty; taper C toward the darkest and lightest steps instead of holding it constant.
+- **Solid tokens for text, not alpha.** `color-mix()` or a named token gives one measurable colour; text at 60% opacity lands on a different colour over every surface (CO-17). Over a photograph, measure the contrast at the worst spot under the text, not the average.
+- **Colour is never the only signal.** Check the palette with a colour-vision simulation (DevTools › Rendering › Emulate vision deficiencies): status, links and chart series need a second cue (an icon, a pattern, a label).
 - **Gamut:** high-chroma OKLCH values fall outside sRGB. Keep the accents where `@media (color-gamut: p3)` is not needed, or provide both.
 - **Name by role, not by value:** `--ground`, `--ink`, `--accent`, never `--blue-500` in components.
 

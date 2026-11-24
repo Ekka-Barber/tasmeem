@@ -33,3 +33,21 @@ A second theme (dark, high contrast, a seasonal skin) shipped with broken contra
 Design choices with no stated reason in the direction or `DESIGN.md`: a style picked from a menu, a trend applied everywhere.
 **Fix:** each major choice (palette, type, layout idea, signature element) gets one sentence tying it to the subject, the audience or the use scene.
 **Sources:** FD IM TS AS
+
+### SY-08 · Unthemed browser surfaces · P2 · scan
+The palette stops at the page: text selection is the system blue, checkboxes and range inputs keep the default accent, the caret and scrollbars ignore the theme, and `color-scheme` is not declared, so form controls stay light on a dark page.
+**Fix:** set `color-scheme`, `accent-color`, `::selection`, `caret-color` and (where the design shows a scroller) `scrollbar-color` from the tokens.
+**Sources:** IM
+
+### SY-09 · A famous product's skin · P1 · eye
+The page is recognisably Linear, Vercel, Stripe or Notion with the logo swapped, and nobody asked for that.
+**Why:** a named reference sets the quality bar. It does not set the style.
+**Fix:** take the standard of finish from the reference, and take the look from the subject's own world (`core/direction.md` §4).
+**Allowed:** when the user asks for a study of that product's structure (study mode extracts principles, never pixels).
+**Sources:** AS IM
+
+### SY-10 · The template stack · P1 · scan
+Six or more different taste tells in one file. One gradient is a choice; a gradient, a pill badge, an eyebrow, three icon cards, a fade-up and a glass panel together are the template.
+**Why:** tells cluster. In one published count of AI-built pages, about half carried six or more at once.
+**Fix:** do not fix the items one by one, because the structure will survive. Return to the direction (`core/direction.md` §8) and change the silhouette.
+**Sources:** AD T

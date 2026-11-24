@@ -34,7 +34,7 @@ export function exceptionsFrom(...docs) {
   return ex
 }
 
-const NEVER_EXCEPT = /^(QA-|SC-(0[1-9]|10)|CP-0[78])/
+const NEVER_EXCEPT = /^(QA-|SC-(0[1-9]|10|20|22)|CP-0[78]|CM-21)/
 
 export function buildReport(results, { design, product } = {}) {
   const cat = catalog()

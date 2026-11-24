@@ -115,3 +115,18 @@ Button, navigation or breadcrumb labels breaking onto two lines at any tested wi
 ### LA-23 · Generated layout bugs · P1 · built
 `body { display: contents }`, empty grid tracks left as spacers, and padding that collides when flex items wrap.
 **Sources:** GS
+
+### LA-24 · A layout with only two states · P2 · scan render
+One column on the phone, then three or four columns at the next breakpoint, with nothing between. At 700 to 900 px the cards are either stretched or crushed.
+**Fix:** add the middle state (two columns, or a different arrangement), or let the grid decide with `repeat(auto-fit, minmax(…, 1fr))` or a container query.
+**Sources:** AS
+
+### LA-25 · Desktop section padding on a phone · P2 · scan render
+96 to 160 px of block padding kept at 360 px wide, so one idea takes three screens of scrolling.
+**Fix:** scale the section rhythm with the viewport (`clamp()`), or roughly halve it under the first breakpoint.
+**Sources:** AS
+
+### LA-26 · Stock sections with stock words · P2 · scan eye
+"How it works" in three round-icon steps, a "Trusted by" logo strip that scrolls by itself, a FAQ whose questions nobody asked ("Is my data secure?", "Can I cancel anytime?"), a sign-up or payment form with no link to terms or privacy.
+**Fix:** keep a section only when the owner supplied its content. A real FAQ comes from real questions; a real logo strip comes from real customers who agreed.
+**Sources:** AS AD HM

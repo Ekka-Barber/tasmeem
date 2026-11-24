@@ -104,3 +104,19 @@ Detailed lists live in `scripts/data/copy-tells.json` and in each `scripts-lang/
   - «راهکارهای نوآورانه»، «تجربه‌ای بی‌نظیر»، «به سادگی»، «فقط با یک کلیک»، «نسل جدید»;
   - staged contrast «نه تنها… بلکه…»;
   - Arabic ي/ك typed instead of Persian ی/ک, and a missing ZWNJ (نیم‌فاصله), which are script defects (SC-09).
+
+### CP-17 · Inflated significance · P1 · scan
+"A testament to", "a pivotal moment", "a new era of", "at its core", "what really matters", «مما لا شك فيه», «لحظة فارقة», «في جوهره».
+**Why:** the sentence claims importance instead of stating the fact that would show it.
+**Fix:** state the fact. If there is none, delete the sentence.
+**Sources:** AS IM
+
+### CP-18 · Chatbot residue · P2 · scan
+"Let's dive in", "let's be honest", "here's the thing", "hope this helps", "feel free to", «دعنا نتعمق», «لنكن صريحين»: the voice of an assistant answering a prompt, left inside an interface.
+**Fix:** delete it. Interface text addresses a task, not a conversation.
+**Sources:** AS
+
+### CP-19 · Formula labels · P2 · eye
+Meta lines strung with middle dots ("Design · Build · Ship"), labels shaped "WORD — fragment", a `→` on every link, section-label comments left visible. They are the tasteful-looking default of the second generation of generated pages.
+**Fix:** write the label as a plain noun or a plain sentence. Use a separator only between real items of one kind (a date and a reading time).
+**Sources:** FD AD

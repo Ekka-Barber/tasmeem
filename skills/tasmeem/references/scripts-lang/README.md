@@ -16,8 +16,8 @@ tasmeem currently supports three languages and two scripts: Arabic and Persian (
 1. **`lang` on the root and on every passage in another language;** `dir` where the direction differs.
 2. **Scope typography with `:lang()`.** One stylesheet, both scripts:
    ```css
-   :root { --leading-body: 1.5; --track-label: 0.04em; }
-   :lang(ar), :lang(fa) { --leading-body: 1.7; --track-label: 0; }
+   :root { --leading-body: 1.5; --leading-tight: 1.15; --track-label: 0.04em; }
+   :lang(ar), :lang(fa) { --leading-body: 1.7; --leading-tight: 1.3; --track-label: 0; }
    ```
 3. **A face per script, designed to pair.** Choose the Arabic-script face first, then a Latin partner that matches its x-height and colour, or a superfamily that covers both.
 4. **Load only the subsets you use** (`unicode-range`), preload the body weight, and verify coverage in the browser. A fallback font is a defect; tofu (□) is a failure.

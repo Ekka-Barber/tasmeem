@@ -74,3 +74,18 @@ Icon-only buttons and links without an accessible name.
 ### QA-16 · Motion safety · P0 · render
 Flashing more than three times a second; parallax or large movement with no reduced-motion path (see MO-05).
 **Sources:** WG T
+
+### QA-17 · Mouse-only gestures · P1 · scan render
+Drag, swipe or resize built on `mousedown` and `mousemove` only, with no pointer or touch events, no `touch-action`, and a drag state that never clears when the pointer leaves or the gesture is cancelled.
+**Fix:** pointer events with `setPointerCapture`, clean up on `pointercancel` and `lostpointercapture`, set `touch-action` on the surface, and give every gesture a button or keyboard equivalent (WCAG 2.5.7).
+**Sources:** IM EK
+
+### QA-18 · A bottom bar that ignores the device · P1 · scan render
+A fixed bottom bar with no `env(safe-area-inset-bottom)`, no space reserved under the content, and a field that the on-screen keyboard covers.
+**Fix:** pad the bar with the safe-area inset, reserve its height at the end of the page, use `dvh` for full-height panels, and give scroll containers `scroll-padding-block-end`.
+**Sources:** AS IM
+
+### QA-19 · Form controls under 16 px · P1 · scan render
+An input, select or textarea set below 16 px. iOS zooms the whole page when it takes focus, and the layout stays zoomed.
+**Fix:** 16 px or more on every form control. Never fix it by disabling zoom (QA-06).
+**Sources:** IM

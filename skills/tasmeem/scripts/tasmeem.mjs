@@ -11,12 +11,15 @@ import { inventory } from './lib/tokens.mjs'
 import { paletteOf } from './lib/palette.mjs'
 import { parseColor, contrast, rgbToOklch, fmtOklch } from './lib/color.mjs'
 import { context } from './lib/context.mjs'
+import { checkKept } from './lib/kept.mjs'
 import * as higgs from './lib/higgs.mjs'
 
 const HELP = `tasmeem · design tells, writing systems, contrast, assets
 
   context [--target dir]                 project brief, scripts present, tools available
-  scan <paths…> [--json] [--content]     source tells (CSS, JSX/TSX, HTML, Vue, Svelte, Astro)
+  scan <paths…> [--json] [--content] [--github]   source tells (CSS, JSX/TSX, HTML, Vue, Svelte, Astro)
+  scan --hook                            read a Claude Code PostToolUse event on stdin; scan the edited file
+  kept <before> <after> [--json]         redesign safety: links, fields, headings and images the new version dropped
   built <dir> [--json]                   built HTML with local stylesheets inlined
   render <url> [--widths 360,768,1024,1440] [--motion] [--out dir] [--json]
   contrast <fg> <bg>                     WCAG ratio (hex, rgb(), hsl(), oklch())
@@ -28,13 +31,13 @@ const HELP = `tasmeem · design tells, writing systems, contrast, assets
       gen  --model … --prompt-file … --out public/plates/x.png [--ref crop.png] [--background transparent]
            --budget <credits> | --yes    (refuses to spend without one of them)
 
-Exit codes: 0 clean · 1 findings at P0 (scan/built/render/report) · 2 usage or environment error.`
+Exit codes: 0 clean · 1 findings at P0 (scan/built/render/report/kept) · 2 usage or environment error, or nothing readable to check.`
 
 async function main() {
   const [cmd, ...rest] = process.argv.slice(2)
   const a = parseArgs(rest)
   const emit = (res) => {
-    const text = a.json ? JSON.stringify(res, null, 2) : printHuman(res)
+    const text = a.json ? JSON.stringify(res, null, 2) : a.github ? githubAnnotations(res) : printHuman(res)
     if (a.out && cmd !== 'render') { mkdirSync(dirname(resolve(a.out)), { recursive: true }); writeFileSync(a.out, text + '\n') }
     else console.log(text)
     return res.findings && res.findings.some((f) => f.severity === 'P0') ? 1 : 0
@@ -42,10 +45,19 @@ async function main() {
   switch (cmd) {
     case 'context': console.log(await context(a.target || a._[0] || '.')); return 0
     case 'scan': {
+      if (a.hook) return hook()
       if (!a._.length) return usage('scan needs paths')
       const files = collectFiles(a._, { includeContent: !!a.content })
+      // A zero that was not read is not a pass.
+      if (!files.length) { console.error(`tasmeem: nothing scannable under ${a._.join(', ')} (no CSS, markup or script files)`); return 2 }
       const res = scanFiles(files)
       return emit({ tool: 'scan', scanned: files.length, ...res })
+    }
+    case 'kept': {
+      if (a._.length !== 2) return usage('kept needs two paths: before and after')
+      const res = checkKept([a._[0]], [a._[1]])
+      if (!res.read.before || !res.read.after) { console.error(`tasmeem: kept read ${res.read.before} file(s) before and ${res.read.after} after; both sides need readable files`); return 2 }
+      return emit(res)
     }
     case 'built': {
       if (!a._[0]) return usage('built needs a directory')
@@ -106,6 +118,26 @@ async function higgsCmd(a) {
     console.log(JSON.stringify(r, null, 2)); return r.ok ? 0 : 2
   }
   return usage('higgs doctor | cost | gen')
+}
+
+// GitHub Actions workflow commands: each finding becomes an annotation on the pull request.
+function githubAnnotations(res) {
+  const level = { P0: 'error', P1: 'warning', P2: 'notice' }
+  const esc = (s) => String(s).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')
+  return res.findings.map((f) => `::${level[f.severity] || 'notice'} ${f.file ? `file=${f.file},` : ''}${f.line ? `line=${f.line},` : ''}title=${f.id}::${esc(f.message)}`).join('\n') || '::notice::tasmeem: no findings'
+}
+
+// PostToolUse hook: exit 2 sends the findings back to the agent, which fixes them before moving on.
+function hook() {
+  let file
+  try { file = JSON.parse(readFileSync(0, 'utf8')).tool_input?.file_path } catch { return 0 }
+  if (!file) return 0
+  const files = collectFiles([file])
+  if (!files.length) return 0
+  const bad = scanFiles(files).findings.filter((f) => f.severity === 'P0')
+  if (!bad.length) return 0
+  console.error(printHuman({ tool: 'scan', scanned: 1, findings: bad }))
+  return 2
 }
 
 function usage(msg) { console.error(`tasmeem: ${msg}\n\n${HELP}`); return 2 }

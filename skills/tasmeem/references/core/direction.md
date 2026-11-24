@@ -37,7 +37,20 @@ A barbershop has razors, hot towels, a striped pole, receipt pads, chair leather
 
 **Culture without costume.** Include the place and the language, but not the tourist clichés (see `scripts-lang/arabic.md` §10). What does this product's street actually look like?
 
-## 5. Set the dials
+## 5. Name the surface type
+
+The same brand needs different rules on different surfaces. Decide which one this is:
+
+| Type | Examples | What the world lends it | Motion | Density |
+|---|---|---|---|---|
+| **persuade** | landing, campaign, launch | everything: palette, type, imagery, layout, one signature moment | one orchestrated entrance | sparse |
+| **operate** | dashboard, admin, booking flow, settings | type, palette, density and one signature move; never decoration over the task | feedback only, no page-load choreography | dense |
+| **read** | article, docs, menu, legal | the frame (header, colour, the opening); never the column itself | none in the text | a measured column |
+| **experience** | portfolio, gallery, a game, an exhibit | the whole screen, as long as content and controls stay reachable | cinematic, with a reduced-motion path | the work decides |
+
+State it in the design read. The tells bend to it: a dense operate screen is not "cramped" (LA-17), and a persuade page with no imagery is a missed slot (IG-07).
+
+## 5b. Set the dials
 
 | Dial | 1 | 10 |
 |---|---|---|
@@ -87,7 +100,9 @@ Before writing code, test the plan:
    - brutalist mono-yellow;
    - the cultural costume.
 4. **Silhouette.** Shrink the planned first screen to a small grey block diagram. Is it the centred hero over three cards? Then change the structure, not only the colours.
-5. **Honesty.** List every fact the design needs (numbers, names, quotes, prices, logos). Mark each as *supplied* or *missing*. Missing facts become labelled gaps, never inventions (see `honesty.md`).
+5. **Name the rut, then leave it.** Write the first plan that came to mind ("the obvious page for this") and its predictable opposite ("the obvious anti-page"), then sketch at least three more candidates drawn from different material families of the subject's world (paper, metal, cloth, light, sign, tool…). Choose one for a reason tied to the subject. If `DESIGN.md` lists **Directions already used** for this owner, do not repeat one. When the user wants the category standard (a bank that must look like a bank), say so and take it on purpose.
+6. **A named product sets the bar, not the look.** "Like Linear" means that level of finish, not its skin (SY-09).
+7. **Honesty.** List every fact the design needs (numbers, names, quotes, prices, logos). Mark each as *supplied* or *missing*. Missing facts become labelled gaps, never inventions (see `honesty.md`).
 
 Say what you changed and why, in one line per change.
 

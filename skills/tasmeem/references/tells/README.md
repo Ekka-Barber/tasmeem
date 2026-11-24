@@ -54,6 +54,7 @@ What it looks like, in one or two sentences.
 - `WG`: Vercel Web Interface Guidelines
 - `UI`: ibelick ui-skills
 - `AF`: designing-arabic-frontends
+- `VS`: visant-skills
 - `T`: tasmeem's own addition
 
 ## Brand exceptions
@@ -63,7 +64,8 @@ A tell is **Allowed** when the project's own `DESIGN.md` or `PRODUCT.md` names t
 Exceptions never cover:
 - accessibility (`QA-`);
 - honesty (CP-07, CP-08);
-- writing-system correctness (`SC-01` to `SC-10`).
+- writing-system correctness (`SC-01` to `SC-10`, `SC-20`, `SC-22`);
+- dead controls (`CM-21`).
 
 A brand cannot make low contrast, invented numbers or letter-spaced Arabic acceptable.
 

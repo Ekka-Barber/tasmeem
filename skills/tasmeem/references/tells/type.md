@@ -135,3 +135,9 @@ A face drawn for display (Kufam, Reem Kufi, Lemonada, Aref Ruqaa, Rakkas, anythi
 Outlined (hollow) headlines, underlines on things that are not links, and faux bold or italic synthesised by the browser.
 **Fix:** solid text; underline links only; `font-synthesis: none` with the real weights loaded.
 **Sources:** GS T
+
+### TY-25 · A system display face as the brand voice · P1 · scan
+Impact, Arial Black or another face that ships with the operating system, used as the headline identity.
+**Why:** it is what a model reaches for when it wants "bold" and has loaded no font.
+**Fix:** choose a display face for the subject, self-host it, and subset it per script.
+**Sources:** IM

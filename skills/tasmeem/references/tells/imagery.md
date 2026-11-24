@@ -57,3 +57,15 @@ Light photos dissolving into a light ground with no edge.
 ### IG-12 · Animated GIF for motion · P2 · scan
 **Fix:** a muted, looping `<video playsinline>` with a still poster and a reduced-motion fallback.
 **Sources:** WG
+
+### IG-13 · Drawn stand-ins for a picture · P1 · scan eye
+An SVG noise filter posing as film grain, a many-point `clip-path` posing as an organic shape, an illustration assembled from dozens of circles and rectangles, "sketch" or "doodle" classes.
+**Why:** it is code pretending to be material. Up close it reads as a diagram of an image.
+**Fix:** paint the material (a real texture plate, a photograph, an authored illustration) through `assets/pipeline.md`, or leave the slot out.
+**Allowed:** real diagrams and data graphics, and marks that are meant to be geometric.
+**Sources:** IM T
+
+### IG-14 · Skeleton product shots and reflex feature icons · P2 · scan eye
+Grey bars arranged as "the app" in the hero, and a sparkle, a lightning bolt, a wand, a robot or a rocket standing for whatever the feature is.
+**Fix:** show a real screenshot or the real component, live. Pick the icon that names the feature, or use none.
+**Sources:** AS AD

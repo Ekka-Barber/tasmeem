@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "tasmeem",
-  "description": "Arabic-first design skill: build, audit and polish interfaces that do not look AI-generated, in any writing system.",
+  "description": "Arabic-first design skill: build, audit, critique and polish interfaces that do not look AI-generated, in any writing system.",
   "owner": { "name": "Ekka Barber", "url": "https://github.com/Ekka-Barber" },
   "plugins": [
     {

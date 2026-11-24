@@ -8,6 +8,8 @@
   <style>
     @font-face { font-family: "Readex Pro"; src: url("/fonts/readex.woff2") format("woff2"); font-display: swap; }
     :root { --ground: oklch(0.3 0.03 150); --ink: oklch(0.96 0.01 150); --accent: oklch(0.72 0.14 60); --dur: 180ms; }
+    html { color-scheme: dark; accent-color: var(--accent); }
+    ::selection { background: var(--accent); color: var(--ground); }
     body { font-family: "Readex Pro", sans-serif; background: var(--ground); color: var(--ink); line-height: 1.7; margin: 0; }
     :is(:lang(ar), :lang(fa)) { letter-spacing: 0; font-style: normal; }
     .intro { margin-inline-start: 1.5rem; padding-inline: 1rem; text-align: start; max-inline-size: 60ch; }

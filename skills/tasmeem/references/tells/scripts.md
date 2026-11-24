@@ -15,7 +15,7 @@ Any non-zero `letter-spacing` on Arabic-script text, including through inherited
 **Fix:** emphasise with weight, colour or size.
 **Sources:** AF HM T
 
-### SC-03 · Line height below the script's floor · P0 · render
+### SC-03 · Line height below the script's floor · P0 · scan render
 Body `line-height` below what the script needs, so marks collide or are clipped:
 
 | Text | Body minimum | Display minimum |
@@ -34,7 +34,7 @@ Glyphs drawn by a system fallback because the chosen family lacks them (P1), or 
 **Sources:** AF T
 
 ### SC-05 · Missing direction, or physical CSS in RTL · P1 · scan built
-An Arabic or Persian page without `dir="rtl"` on `<html>`, or CSS that pins sides physically: `margin-left`, `padding-right`, `left:`, `text-align: left`, `float: right`, `border-left`, `translateX()` for "forward" movement.
+An Arabic or Persian page without `dir="rtl"` on `<html>`, or CSS that pins sides physically: `margin-left`, `padding-right`, `left:`, `text-align: left`, `float: right`, `border-left`, `background-position: right`, `transform-origin: left`, `border-top-left-radius`, a fade mask `to right`, `translateX()` for "forward" movement, and the Tailwind forms (`ml-*`, `text-left`, `bg-left`, `origin-left`, `bg-linear-to-r`; `space-x-*` in Tailwind v3 only). The scanner finds the CSS and Tailwind forms; transforms need the render check or an eye.
 **Fix:** logical properties throughout (`margin-inline-start`, `inset-inline-end`, `text-align: start`, `border-inline-start`). For transforms, pair the values with `:dir(rtl)` or a direction variable.
 **Allowed:** physical sides that are truly physical: a map pin, a scrollbar gutter, a crop focus point.
 **Sources:** AF T
@@ -106,8 +106,39 @@ Photographs, logos, brand marks and media timelines flipped for RTL; charts whos
 
 ### SC-19 · Locale assumptions · P2 · eye
 - the calendar not pinned: some engines resolve `ar-SA` to Hijri, others to Gregorian, and Persian needs `persian`;
-- the week starting on Sunday where it starts on Saturday;
+- the week start or the weekend hard-coded: Saudi Arabia starts on Sunday, Egypt and Kuwait on Saturday, the UAE on Monday;
 - name and address forms that assume "first name, last name, state, ZIP";
 - phone fields that reject local formats.
 **Fix:** `Intl` with explicit `calendar` and `numberingSystem`, and a form structure that fits the locale (see `scripts-lang/numerals-dates.md`).
+**Sources:** AF T
+
+### SC-20 · Ligatures switched off · P0 · scan render
+`font-variant-ligatures: none`, or `font-feature-settings` with `"liga" 0`, `"calt" 0` or `"rlig" 0`, reaching Arabic or Persian text. Usually copied from a code-font or a "crisp Latin" snippet.
+**Why:** Arabic needs these features to join its letters and to form لا. Without them the text falls apart into isolated or wrong forms.
+**Fix:** delete the declaration, or scope it to `:lang(en)` or `code, pre`.
+**Allowed:** never on Arabic-script text.
+**Sources:** AF T
+
+### SC-21 · Letters styled one by one · P2 · scan eye
+`::first-letter` or `initial-letter` on Arabic, or a tag that opens in the middle of a word («كتا<span>ب</span>ة») for a highlight, a drop cap or a colour accent.
+**Why:** an Arabic letter is joined to its neighbours. A drop cap tears it out of the word, and some engines stop shaping across the tag boundary when the font or size changes (W3C alreq §4.3).
+**Fix:** style whole words. For a search highlight inside a word, change only the colour or background, keep the font and size the same, and check both sides of the tag in the browser.
+**Sources:** AF T
+
+### SC-22 · Direction-blind code · P1 · scan render
+Script that assumes left is back: `scrollLeft` maths, `ArrowLeft` meaning "previous", `side="right"` or `placement="left"` on popovers and sheets, swipe deltas from `clientX`, and Radix or shadcn primitives with no `DirectionProvider`, so their keyboard navigation, sliders and portals stay LTR on an RTL page.
+**Why:** CSS logical properties fix the layout; they do not touch JavaScript. The page looks mirrored and behaves backwards.
+**Fix:** branch on `getComputedStyle(el).direction` (or the app's locale), use `start` and `end` props where the library has them, and wrap the app in `DirectionProvider dir="rtl"` (shadcn: `"rtl": true` in `components.json`). In Chromium, `scrollLeft` is 0 at the start of an RTL scroller and negative as it scrolls.
+**Sources:** AF T
+
+### SC-23 · Digits the code cannot read · P1 · scan
+`<input type="number">`, `pattern="\d…"`, `/\d/`, `Number()` or `parseInt()` applied to what an Arabic or Persian user typed. `/\d/` does not match «٣», and `Number('٣')` is `NaN`, so a valid phone number or amount is rejected.
+**Fix:** a text input with `inputmode="numeric"` or `"decimal"`, normalising U+0660–0669 and U+06F0–06F9 to ASCII before validation (`numerals-dates.md`). Display stays in the product's digit policy.
+**Sources:** AF T
+
+### SC-24 · Direction set in the wrong place · P2 · scan
+`direction: rtl` in CSS instead of `dir="rtl"` in the markup, or `unicode-bidi: bidi-override` and `<bdo>` used to "fix" scrambled text.
+**Why:** direction is part of the content. In CSS it disappears for readers, search engines and anything that strips styles; an override forces the visual order and breaks the next string that arrives.
+**Fix:** `dir` on the element (or `dir="auto"` for user text), and isolation (`<bdi>`, `unicode-bidi: isolate`) for embedded runs.
+**Allowed:** `bidi-override` for a deliberate demonstration of visual order.
 **Sources:** AF T

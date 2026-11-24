@@ -16,6 +16,11 @@ tasmeem stands on the work of many people who wrote down what good interfaces ar
 | WG | [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) by Vercel | (no licence file; ideas only, not text) | the engineering checklist: focus, forms, touch, i18n, hydration, content handling |
 | UI | [ui-skills](https://github.com/ibelick/ui-skills) by ibelick | MIT | accessibility and motion-performance fixing passes |
 | AF | [designing-arabic-frontends](https://github.com/ahmed-badawood/designing-arabic-frontends) by Ahmed Badawood | MIT | Arabic font declaration, line-height clipping, digit policy, per-element logical properties, bidi islands |
+| VS | [visant-skills](https://github.com/pedrojaques99/visant-skills-public) by Pedro Jaques | see repository | detectors tested both ways against fixtures; refusing to report a zero that was not read; the opacity ladder |
+| | [DESIGN.md](https://github.com/google-labs-code/design.md) by Google Labs | Apache-2.0 | the open token format for `DESIGN.md`, and its linter |
+| | [W3C Arabic and Persian Layout Requirements](https://www.w3.org/TR/alreq/) | W3C | letters styled one by one, bidi classes of digits, line breaking |
+| | [antialgorithm](https://github.com/mankidev/antialgorithm) | see repository | naming the first, most average pick before moving away from it; remembering past directions |
+| | [awesome-design-md-jp](https://github.com/kzhrknt/awesome-design-md-jp) | see repository | script-specific sections inside `DESIGN.md` |
 | | [web-quality-skills](https://github.com/addyosmani/web-quality-skills) by Addy Osmani | MIT | performance and Core Web Vitals framing |
 | | [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | the Google Fonts script-coverage data that guided the per-script font lists |
 | | [/rasm](https://github.com/Ekka-Barber/higgsfield-prompt-master) | MIT | Arabic-first image prompting; model routing; generated-Arabic failure modes |
@@ -28,4 +33,8 @@ tasmeem's own additions are marked `T`:
 - the Arabic copy tells;
 - the render checks for script typography and fonts actually used;
 - the Higgsfield bridge with its cost gate;
-- the "paint the material, code the meaning" rule for generated assets.
+- the "paint the material, code the meaning" rule for generated assets;
+- the direction-aware JavaScript, digit-safe input and riyal-sign checks;
+- the `kept` redesign check and the template-stack score in its current form.
+
+In 0.2.0, the newer releases of impeccable (4.x), antislop (3.x), avoid-ai-design (0.5), Hallmark, taste-skill (2.5) and Anthropic's frontend-design were read again for what they added since September 2026.

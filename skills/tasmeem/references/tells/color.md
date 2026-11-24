@@ -98,3 +98,8 @@ Hex, `rgb()` or `oklch()` literals in components while a token system exists.
 **Why:** improvised values drift, and drift is how a system stops being one.
 **Fix:** lift the value into the token file with a name, then reference it.
 **Sources:** HM IM UI T
+
+### CO-17 · The opacity ladder · P2 · scan
+One colour used at five or more opacities (`/40 /50 /60 /70 /90`) to make the hierarchy. Each step lands on a different background, so the contrast is never the same twice and cannot be checked.
+**Fix:** name three or four solid text and surface tokens (ink, muted, faint, line) and measure each pair once.
+**Sources:** VS IM

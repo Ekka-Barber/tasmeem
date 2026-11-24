@@ -87,3 +87,19 @@ Scroll listeners that read layout and set styles on every event.
 ### MO-18 · A heavy runtime for a still image · P2 · scan
 A Lottie file or a Three.js scene rendering what is effectively a still image or a simple loop.
 **Sources:** HM
+
+### MO-19 · Reduced motion as a kill switch · P2 · scan
+`* { animation-duration: 0.01ms !important }` under `prefers-reduced-motion`. It removes the colour and opacity feedback together with the movement, and it breaks code that waits for `animationend`.
+**Fix:** remove travel, scale, parallax and autoplay. Keep short opacity and colour changes, so the interface still answers (`motion/principles.md`).
+**Sources:** IM
+
+### MO-20 · Feedback with the wrong timing · P2 · scan render
+A focus ring that fades in; a tooltip that waits as long on keyboard focus as on hover; a spinner that flashes for 80 ms.
+**Fix:** the ring appears at once. Tooltips open with no delay on focus. Show a spinner only after about 150 ms, and then keep it for at least 300 ms.
+**Sources:** HM
+
+### MO-21 · The typed-out headline · P2 · scan
+A headline that types itself, deletes itself and types the next word.
+**Why:** the reader waits for the sentence, and a screen reader hears it in pieces.
+**Fix:** set the sentence. If the rotating words matter, list them.
+**Sources:** AD
