@@ -11,9 +11,10 @@
 
 - **Ellipsis** «…» (U+2026), not three dots. Loading states end with it: "Saving…", «جارٍ الحفظ…», «در حال ذخیره…».
 - **Dashes:**
-  - an en dash (–) for ranges;
+  - an en dash (–) for ranges in English, tables and compact labels; in Arabic and Persian prose, write the range in words: «من ٣ إلى ٥ أيام», «بين ١٠ و٢٠»;
   - an em dash (—) only where the author uses it, and never sprinkled through interface copy (CP-05);
   - Arabic and Persian rarely use the em dash.
 - **No-break spaces** between a number and its unit (`10 MB`, «٥ كم»), and before a closing mark that follows a space.
 - **In right-to-left text,** the browser mirrors brackets and parentheses. Type them in logical order, never reversed.
 - **Fonts:** check that the chosen fonts include «» ؟ ، ؛ and the curly quotes.
+- **Arabic and Persian text:** no «&» between words (write «و»), and no doubled «!!» or «؟؟» in interface text.

@@ -8,7 +8,8 @@ A beautiful page with invented facts is still slop, and it is worse than an ugly
 - testimonials, quotes, names or photos of real-seeming people;
 - client logos, press mentions, awards;
 - prices, delivery times, stock levels;
-- capabilities the product does not have.
+- capabilities the product does not have;
+- certifications, registrations and official marks: a government stamp or banner, «مسجّل لدى هيئة الحكومة الرقمية», "SOC 2", "ISO 27001". Only the entity that holds them shows them.
 
 When a design needs a fact that does not exist yet:
 - **show a labelled gap** («يُعلن قريباً», "Price to be announced", "Metric to confirm") styled as part of the design, not as a broken slot;

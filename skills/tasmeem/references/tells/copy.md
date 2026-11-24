@@ -120,3 +120,22 @@ Detailed lists live in `scripts/data/copy-tells.json` and in each `scripts-lang/
 Meta lines strung with middle dots ("Design · Build · Ship"), labels shaped "WORD — fragment", a `→` on every link, section-label comments left visible. They are the tasteful-looking default of the second generation of generated pages.
 **Fix:** write the label as a plain noun or a plain sentence. Use a separator only between real items of one kind (a date and a reading time).
 **Sources:** FD AD
+
+### CP-20 · Slash-doubled gender · P1 · scan
+«أدخل/ي رقمك», «عزيزي/عزيزتي», «مسجّل/ة»: both genders crammed into one word with a slash.
+**Why:** it reads as a form designed by a committee, it breaks screen readers, and no one says it aloud.
+**Fix:** pick one address strategy for the product (`scripts-lang/arabic.md` §9): the conventional masculine generic, or neutral constructions («يرجى إدخال رقم الجوال», «تسجيل الدخول»). Use the feminine form for services aimed at women.
+**Allowed:** «و/أو».
+**Sources:** UAE-C MS T
+
+### CP-21 · Spelling slips in Arabic · P2 · scan
+A detached «و» («و الحجز»), merged negations («لايوجد», «لايمكن»), hamza errors («انشاء» for «إنشاء»), and «1 ملف» / «2 ملف» where Arabic writes «ملف واحد» / «ملفان».
+**Why:** they read as careless, and they break search and screen readers.
+**Fix:** attach «و» to the next word, separate «لا», check the hamza, and write one and two as words.
+**Sources:** AC MS T
+
+### CP-22 · Directions by side · P2 · scan
+«اضغط الزر على اليسار», "the menu on the right": instructions that name a side.
+**Why:** the side flips with the language and the screen size, so the instruction is wrong for half the readers.
+**Fix:** name the control («اضغط "إرسال"») or its role («القائمة الرئيسية»).
+**Sources:** UX-AR T

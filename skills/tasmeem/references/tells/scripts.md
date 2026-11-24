@@ -20,12 +20,13 @@ Body `line-height` below what the script needs, so marks collide or are clipped:
 
 | Text | Body minimum | Display minimum |
 |---|---|---|
-| Arabic, Persian (Naskh-style faces) | 1.6 | 1.25 |
+| Arabic, Persian (Naskh-style faces) | 1.6 recommended; below 1.45 is P0 | 1.25 |
 | Persian Nastaliq (display, poetry) | 2.2 | 1.6 |
 | English | 1.35 | 1.0 |
 
 **Fix:** set the line height per `:lang()`, not one global value.
-**Sources:** AF T
+**Note:** the Gulf government design systems ship Arabic body text at 1.5 (DGA 16/24, UAE 1.5, Dubai 14/20 on phones). Between 1.45 and 1.6 the scanner reports P2, not P0: follow the mandated tokens on a government surface, and prefer 1.6 or more everywhere else.
+**Sources:** AF DGA UAE-T T
 
 ### SC-04 · Fallback fonts and missing glyphs · P0/P1 · render
 Glyphs drawn by a system fallback because the chosen family lacks them (P1), or tofu boxes, □, for characters no font covers (P0). This is common for Arabic-Indic and Persian digits, the Persian letters پ چ ژ گ, «ﷺ», and the Saudi riyal sign.
@@ -42,7 +43,7 @@ An Arabic or Persian page without `dir="rtl"` on `<html>`, or CSS that pins side
 ### SC-06 · Direction-blind icons · P1 · scan render
 In RTL:
 - arrows, chevrons, back and forward, send, reply, undo and redo, and list indentation left unmirrored;
-- or icons mirrored that must not be: clocks, media play, checkmarks, logos, anything containing letters or digits.
+- or icons mirrored that must not be: clocks, refresh and history (circular time), the search magnifier, media play and the playback bar, checkmarks, the slash in "off" icons, keyboards, logos, anything containing letters or digits.
 
 **Fix:** mirror by meaning with `:dir(rtl) .icon-directional { transform: scaleX(-1) }`. In Arabic and Persian, "next" points left (`←`).
 **Sources:** AF T
@@ -66,7 +67,7 @@ Arabic-Indic (٠١٢٣), Persian (۰۱۲۳) and Western (0123) digits mixed in o
 **Sources:** T
 
 ### SC-10 · Bidi scramble · P1 · render
-English tokens inside Arabic or Persian text (phone numbers, emails, URLs, code, product names like "iPhone 17 Pro") left unisolated, so digits, parentheses and punctuation jump to the wrong side. A related defect: `dir="ltr"` put on a block element, which flips its alignment.
+English tokens inside Arabic or Persian text (phone numbers, emails, URLs, code, product names like "iPhone 17 Pro") left unisolated, so digits, parentheses and punctuation jump to the wrong side. A related defect: `dir="ltr"` put on a short block (a label, a list item), which flips its alignment. A whole English paragraph of three lines or more may align to its own language.
 **Fix:**
 - `<bdi>`, or `unicode-bidi: isolate` on inline spans with `dir="ltr"`;
 - `dir="auto"` for user content;
@@ -142,3 +143,14 @@ Script that assumes left is back: `scrollLeft` maths, `ArrowLeft` meaning "previ
 **Fix:** `dir` on the element (or `dir="auto"` for user text), and isolation (`<bdi>`, `unicode-bidi: isolate`) for embedded runs.
 **Allowed:** `bidi-override` for a deliberate demonstration of visual order.
 **Sources:** AF T
+
+### SC-25 · The language switch done wrong · P2 · scan eye
+A flag for a language (Arabic is not one country), a bare `EN` / `AR` code, a switch that drops the reader on the home page, the language in a query string or a cookie, or a redirect chosen from the IP address or `navigator.language`.
+**Fix:** one switch in the header utilities (and in the mobile menu), labelled with the target language's own name («English», «العربية») with `lang` on the label; it lands on the same page in the other language; one URL per language; never redirect by guess (`scripts-lang/bilingual.md`).
+**Sources:** USWDS UAE-C GSC T
+
+### SC-26 · Reversing what the browser already reversed · P1 · scan
+`flex-direction: row-reverse`, `order` or `rtl:flex-row-reverse` added "for RTL". With `dir="rtl"` set, flex rows, grids and inline flow already run right to left, so the extra reversal turns them back to left to right. The same mistake happens when a layout is coded from an RTL design file by copying its left-to-right x-order.
+**Fix:** delete the reversal. The DOM order is the reading order; `dir` does the mirroring.
+**Allowed:** a reversal that is about content, in both directions (a chat where your own messages sit at the end).
+**Sources:** RT DK T

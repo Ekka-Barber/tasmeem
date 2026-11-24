@@ -112,6 +112,7 @@ export function scanDocs(input) {
   if (sig.motion && !sig.reducedMotion) push(null, 'MO-05', 'P0', undefined, 'motion exists but no prefers-reduced-motion path anywhere')
   if (/outline\s*:\s*(none|0)\b|\boutline-none\b/.test(all) && !sig.focusVisible) push(null, 'QA-02', 'P0', undefined, 'outline removed and no :focus-visible replacement anywhere')
   if (sig.rtl && /from\s+["'](@radix-ui\/react-[\w-]+|radix-ui)["']/.test(all) && !/DirectionProvider|\bDirection\.Provider/.test(all)) push(null, 'SC-22', 'P1', undefined, 'Radix primitives in an RTL project with no DirectionProvider: keyboard navigation, sliders and portals stay LTR')
+  if (sig.arabic && /<(input|button|select|textarea)\b/i.test(all) && /@font-face|fonts\.googleapis|next\/font/.test(all) && !/@tailwind|@import\s+["']tailwindcss|className=/.test(all) && !/(button|input|select|textarea)[^{]*\{[^}]*font(-family)?\s*:\s*inherit/.test(all)) push(null, 'SC-04', 'P2', undefined, 'form controls do not inherit the page font: add button, input, select, textarea { font: inherit } or Arabic in them falls back to a system face')
   if (iconLibs.size > 1) push(null, 'SY-05', 'P2', undefined, `several icon families: ${[...iconLibs].join(', ')}`)
   for (const [cls, n] of revealCounts) if (n >= 6) push(null, 'MO-01', 'P1', undefined, `the same entrance "${cls}" on ${n} elements`)
   const families = [...fontFamiliesUsed.keys()].filter((f) => !/^(var|inherit|initial|unset|serif|sans-serif|monospace|ui-|system)/.test(f))
@@ -175,7 +176,7 @@ function cssRules(doc, parsed, sig, push, acc) {
         const em = trackingEm(v, toPx(decl['font-size']) || 16)
         if (em !== null && em < -0.04 && HEADING_SEL.test(sel)) push(doc, 'TY-09', 'P1', L, `crushed tracking ${v}`, sel)
         if (em !== null && em > 0.05 && BODY_SEL.test(sel) && !/uppercase/.test(decl['text-transform'] || '')) push(doc, 'TY-10', 'P1', L, `wide tracking on body text ${v}`, sel)
-        if (sig.arabic && em !== null && em !== 0 && !langScoped) push(doc, 'SC-01', 'P1', L, `letter-spacing ${v} can reach Arabic text (confirm with render; reset under :lang(ar))`, sel, { confirm: 'render' })
+        if (sig.arabic && em !== null && em !== 0 && !langScoped) push(doc, 'SC-01', 'P1', L, `letter-spacing ${v} can reach Arabic text (confirm with render). A :lang(ar) reset only wins if it comes after this rule or is more specific`, sel, { confirm: 'render' })
         if (/:lang\((ar|fa)|\[lang[|^]?=["']?(ar|fa)/.test(sel) && em !== null && em !== 0) push(doc, 'SC-01', 'P0', L, `letter-spacing ${v} set on Arabic`, sel)
       }
       if (d.prop === 'font-style' && /italic|oblique/.test(vl)) {
@@ -196,7 +197,7 @@ function cssRules(doc, parsed, sig, push, acc) {
         const n = parseFloat(v)
         const unitless = /^[\d.]+$/.test(v.trim())
         if (unitless && n < 1.35 && BODY_SEL.test(sel) && !HEADING_SEL.test(sel)) push(doc, 'TY-12', 'P0', L, `body line-height ${v}`, sel)
-        if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.6 && !HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic line-height ${v} (floor 1.6 for body)`, sel)
+        if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.6 && !HEADING_SEL.test(sel)) push(doc, 'SC-03', n < 1.45 ? 'P0' : 'P2', L, n < 1.45 ? `Arabic line-height ${v} (floor 1.6 for body; below 1.45 the marks clip)` : `Arabic line-height ${v}: 1.6 reads better (1.5 is the DGA and UAE government standard)`, sel)
         if (unitless && sig.arabic && /:lang\((ar|fa)/.test(sel) && n < 1.25 && HEADING_SEL.test(sel)) push(doc, 'SC-03', 'P0', L, `Arabic heading line-height ${v} (floor 1.25 for display)`, sel)
       }
       if (d.prop === 'text-align' && vl === 'justify') push(doc, 'TY-16', 'P2', L, sig.arabic ? 'justified text (Arabic without kashida support leaves rivers)' : 'justified text', sel)
@@ -242,17 +243,21 @@ function cssRules(doc, parsed, sig, push, acc) {
       if (d.prop === 'opacity' && parseFloat(v) === 0 && REVEAL_SEL.test(sel) && !/:not\(|\[data-motion|\.motion-ok|\.js-motion|:hover|:focus/.test(sel) && !inReduce) push(doc, 'MO-06', 'P0', L, 'content hidden by default until a reveal runs', sel)
 
       // Writing systems (RTL projects)
-      if (sig.rtl && PHYSICAL_PROPS.test(d.prop) && !/^(0|auto|0px)$/.test(vl.trim()) && !langScoped) push(doc, 'SC-05', 'P1', L, `physical ${d.prop} in an RTL project (use the logical property)`, sel)
+      const centred = /^(left|right)$/.test(d.prop) && /^50%$/.test(vl.trim()) && /translate(x)?\(\s*-50%|translate:\s*-50%/i.test(`${decl.transform || ''} translate: ${decl.translate || ''}`)
+      if (sig.rtl && PHYSICAL_PROPS.test(d.prop) && !/^(0|auto|0px)$/.test(vl.trim()) && !langScoped && !centred) push(doc, 'SC-05', 'P1', L, `physical ${d.prop} in an RTL project (use the logical property)`, sel)
       if (sig.rtl && d.prop === 'text-align' && /^(left|right)$/.test(vl) && !langScoped) push(doc, 'SC-05', 'P1', L, `text-align: ${vl} in an RTL project (use start/end)`, sel)
       if (sig.rtl && d.prop === 'float' && /^(left|right)$/.test(vl)) push(doc, 'SC-05', 'P1', L, `float: ${vl} in an RTL project`, sel)
       const latinOnly = /:lang\(en|\b(code|pre|kbd|samp)\b/.test(sel)
       if (sig.arabic && !latinOnly && ((d.prop === 'font-variant-ligatures' && /none|no-common-ligatures|no-contextual/.test(vl)) || (d.prop === 'font-feature-settings' && /["'](liga|calt|rlig|ccmp)["']\s*(0|off)/.test(vl)))) push(doc, 'SC-20', 'P0', L, `ligatures disabled (${d.prop}: ${v}): Arabic letters stop joining`, sel)
       if (sig.arabic && !latinOnly && (/::?first-letter/.test(sel) || d.prop === 'initial-letter')) push(doc, 'SC-21', 'P1', L, 'first-letter styling can reach Arabic, where the first letter is joined to the rest of the word', sel)
       if (sig.arabic && !latinOnly && /^text-box(-trim|-edge)?$/.test(d.prop) && !/\btext\b/.test(decl['text-box-edge'] || (d.prop === 'text-box' ? vl : ''))) push(doc, 'SC-15', 'P1', L, 'text-box trimming to cap or alphabetic edges can clip Arabic marks (scope it to :lang(en), or use the text edge)', sel)
+      if (/:dir\(rtl\)|\[dir=["']?rtl/.test(sel) && ((d.prop === 'flex-direction' && /row-reverse/.test(vl)) || d.prop === 'order')) push(doc, 'SC-26', 'P1', L, `${d.prop}: ${v} under RTL: flex rows already follow dir, so this reverses them back`, sel)
+      if (sig.arabic && /:lang\((ar|fa)/.test(sel) && d.prop === 'font-size') { const px = toPx(v); if (px !== null && px < 14) push(doc, 'TY-13', 'P1', L, `Arabic at ${px}px: keep Arabic at 14px and up (16px for body)`, sel) }
       if (d.prop === 'direction' && vl === 'rtl') push(doc, 'SC-24', 'P2', L, 'direction set in CSS: put dir="rtl" in the markup, where it survives without styles', sel)
       if (d.prop === 'unicode-bidi' && /bidi-override/.test(vl)) push(doc, 'SC-24', 'P2', L, 'bidi-override forces the visual order: isolate instead (unicode-bidi: isolate, <bdi>, dir="auto")', sel)
       if (sig.rtl && !langScoped) {
         if (/^(background-position(-x)?|mask-position|object-position)$/.test(d.prop) && /\b(left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, `${d.prop}: ${v} in an RTL project (mirror it under :dir(rtl))`, sel)
+        if ((d.prop === 'transform' && /translatex?\(\s*-100%/i.test(vl)) || (d.prop === 'translate' && /^-100%/.test(vl.trim()))) push(doc, 'SC-05', 'P1', L, 'off-canvas panel parked at -100%: in RTL it sits inside the scroll area and adds horizontal scroll (mirror it under :dir(rtl), or display: none when closed)', sel)
         if (d.prop === 'transform-origin' && /\b(left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, `transform-origin: ${v} in an RTL project`, sel)
         if (/^border-(top|bottom)-(left|right)-radius$/.test(d.prop) && !/^0/.test(vl)) push(doc, 'SC-05', 'P1', L, `${d.prop} in an RTL project (use border-start-start-radius and its siblings)`, sel)
         if (/^(mask|-webkit-mask|mask-image|-webkit-mask-image|background|background-image)$/.test(d.prop) && /linear-gradient\(\s*to (left|right)\b/.test(vl)) push(doc, 'SC-05', 'P1', L, 'a horizontal gradient or fade pinned to one side in an RTL project', sel)
@@ -295,8 +300,19 @@ function markupRules(doc, sig, push, acc) {
   if (sig.arabic) {
     for (const m of t.matchAll(/[\u0620-\u064A\u0671-\u06D3][\u064B-\u0652]*<\/?(span|b|strong|em|mark|i|u|a)\b[^>]*>[\u0620-\u064A\u0671-\u06D3]/g)) push(doc, 'SC-21', 'P2', L(m.index), 'a tag splits an Arabic word: check the letters still join on each side', m[0])
     for (const m of t.matchAll(/<input\b[^>]*\btype\s*=\s*["']number["'][^>]*>/gi)) push(doc, 'SC-23', 'P1', L(m.index), 'type="number" in an Arabic-script project: use a text input with inputmode="decimal" and normalise both digit ranges', m[0].slice(0, 90))
+    for (const m of t.matchAll(/\bpattern\s*=\s*["'{][^"'}]*\[0-9\][^"'}]*["'}]/g)) if (!/\u0660|\u06F0/.test(m[0])) push(doc, 'SC-23', 'P1', L(m.index), 'a [0-9] pattern rejects Arabic-Indic digits: normalise first, or use [0-9٠-٩۰-۹]', m[0].slice(0, 90))
     for (const m of t.matchAll(/\bpattern\s*=\s*["'{][^"'}]*\\d/g)) push(doc, 'SC-23', 'P1', L(m.index), 'a \\d pattern rejects Arabic-Indic digits: normalise first, or use [0-9٠-٩۰-۹]', m[0].slice(0, 90))
   }
+  if (sig.rtl && SCRIPTS.arabic.test(t)) {
+    for (const m of t.matchAll(/\b(aria-label|title|placeholder|alt)\s*=\s*["']([A-Za-z][A-Za-z'’ -]*\s[A-Za-z'’ -]{2,})["']/g)) {
+      const tag = t.slice(t.lastIndexOf('<', m.index), t.indexOf('>', m.index) + 1)
+      if (!/\blang\s*=/.test(tag) && !/\b(English|Latin)\b/i.test(m[2])) push(doc, 'QA-20', 'P1', L(m.index), `English ${m[1]} on an Arabic page: screen readers read it with the Arabic voice (translate it, or add lang="en")`, m[0].slice(0, 90))
+    }
+  }
+  for (const m of t.matchAll(/property\s*=\s*["']og:locale(:alternate)?["'][^>]*content\s*=\s*["']([a-z]{2,3}-[A-Za-z]{2,})["']/g)) push(doc, 'QA-21', 'P2', L(m.index), `og:locale "${m[2]}" uses a hyphen: Open Graph wants an underscore (ar_SA)`, m[0].slice(0, 90))
+  for (const m of t.matchAll(/\bhreflang\s*=\s*["']([^"']*)["']/gi)) if (!/^(x-default|[a-z]{2,3}(-[a-z]{4})?(-([a-z]{2}|\d{3}))?)$/i.test(m[1])) push(doc, 'QA-21', 'P1', L(m.index), `invalid hreflang "${m[1]}" (use ar, ar-SA, en, x-default)`, m[0])
+  for (const m of t.matchAll(/[\u{1F1E6}-\u{1F1FF}]{2}|\bfi-(sa|ae|us|gb)\b|\bflag-(sa|ae|us|gb|ar|en)\b/gu)) if (/English|العربية|عربي|فارسی|\b(EN|AR|FA)\b|lang/i.test(t.slice(Math.max(0, m.index - 120), m.index + 120))) push(doc, 'SC-25', 'P2', L(m.index), 'a flag stands for a language in the language switch (use the language name)', m[0])
+  for (const m of t.matchAll(/\bhref\s*=\s*["'{][^"'}]*[?&](lang|locale|language)=/g)) push(doc, 'SC-25', 'P2', L(m.index), 'language in a query string: give each language its own URL (/ar/…, /en/…)', m[0].slice(0, 90))
   // Headline with one accented word (SD5 / TY-04)
   for (const m of t.matchAll(/<h([1-2])\b[^>]*>((?:(?!<\/h\1>)[\s\S]){0,400})<\/h\1>/g)) {
     const inner = m[2]
@@ -363,6 +379,9 @@ function tailwindRules(doc, sig, push) {
     if (has(/\boutline-none\b/) && !has(/focus-visible:/)) push(doc, 'QA-02', 'P1', line, 'outline-none without focus-visible here', cls)
     if (has(/\bz-\[?(999|9999|99999)\]?/)) push(doc, 'SY-04', 'P2', line, 'z-index 999+', cls)
     if (sig.arabic && has(/\btracking-(tight|tighter|wide|wider|widest|\[)/) && SCRIPTS.arabic.test(t.slice(m.index, m.index + 400))) push(doc, 'SC-01', 'P0', line, 'tracking utility next to Arabic text', cls)
+    if (has(/(^|\s)rtl:(flex-row-reverse|order-[\w-]+)(\s|$)/)) push(doc, 'SC-26', 'P1', line, 'rtl:flex-row-reverse or rtl:order-*: flex rows already follow dir, so this reverses them back', cls)
+    const ownText = () => { const open = t.indexOf('>', m.index); return open < 0 ? '' : t.slice(open + 1, t.indexOf('<', open + 1)) }
+    if (sig.arabic && has(/(^|\s)text-(xs|\[(\d|1[0-3])px\])(\s|$)/) && SCRIPTS.arabic.test(ownText())) push(doc, 'TY-13', 'P1', line, 'Arabic text below 14px (text-xs is 12px): Arabic needs 14px and up, 16px for body', cls)
     if (sig.arabic && has(/(^|\s)leading-(none|tight|snug|\[1(\.[0-4]\d*)?\])(\s|$)/) && SCRIPTS.arabic.test(t.slice(m.index, m.index + 400))) {
       const tag = (t.slice(t.lastIndexOf('<', m.index), m.index).match(/^<([\w.]+)/) || [])[1] || ''
       const display = /^h[1-4]$/i.test(tag) || /(^|\s)text-(lg|[2-9]?xl|\[(2\d|[3-9]\d|1\d\d)px\])(\s|$)/.test(cls)
@@ -374,6 +393,7 @@ function tailwindRules(doc, sig, push) {
         const parts = tok.split(':')
         if (parts.slice(0, -1).some((v) => v === 'rtl' || v === 'ltr')) return false
         const u = parts[parts.length - 1]
+        if (/^(left|right)-1\/2$/.test(u) && /-translate-x-1\/2/.test(cls)) return false   // centring is direction-neutral
         return TW_PHYSICAL.test(u) || (sig.tailwind3 && TW_PHYSICAL_V3.test(u))
       })
       if (phys.length) push(doc, 'SC-05', 'P1', line, `physical utilities in an RTL project: ${[...new Set(phys)].slice(0, 4).join(' ')}`, cls)
@@ -395,6 +415,11 @@ function jsRules(doc, sig, push) {
   for (const m of t.matchAll(/\.toLocale(Date|Time)?String\(\s*\)|new Intl\.(NumberFormat|DateTimeFormat|PluralRules|RelativeTimeFormat|ListFormat)\(\s*\)/g)) push(doc, 'QA-10', 'P1', L(m.index), 'formatting with no locale: the server and each browser pick different digits and calendars', m[0])
   for (const m of t.matchAll(/\.toFixed\(\s*2\s*\)/g)) if (/price|amount|total|currency|SAR|KWD|BHD|OMR|JOD|riyal|\u0631\.\u0633|\u0631\u064A\u0627\u0644/i.test(t.slice(Math.max(0, m.index - 120), m.index + 60))) push(doc, 'QA-10', 'P2', L(m.index), 'toFixed(2) on money: KWD, BHD, OMR, JOD and others use 3 decimals (use Intl currency format)', m[0])
   if (sig.arabic) for (const m of t.matchAll(/\b(count|n|num|length|total|qty|quantity|items?|days?)\s*===?\s*1\s*\?/g)) if (SCRIPTS.arabic.test(t.slice(m.index, m.index + 160))) push(doc, 'QA-10', 'P1', L(m.index), 'hand-built plural: Arabic has six forms (use Intl.PluralRules)', m[0])
+  for (const m of t.matchAll(/documentElement\.(dir\s*=|setAttribute\(\s*["']dir)/g)) if (/useEffect|useLayoutEffect|onMounted|componentDidMount|addEventListener\(\s*["'](DOMContentLoaded|load)/.test(t.slice(Math.max(0, m.index - 400), m.index))) push(doc, 'SC-24', 'P1', L(m.index), 'direction set after the first paint: the page flashes in the wrong direction (render dir on <html> on the server)', m[0])
+  for (const m of t.matchAll(/new Intl\.DateTimeFormat\(([^;]{0,240}?)\)/g)) if (/['"`]ar|-ca-|calendar/.test(m[1]) && !/timeZone/.test(m[1])) push(doc, 'QA-10', 'P2', L(m.index), 'date format with no timeZone: the server and the browser can show different days (add timeZone, e.g. Asia/Riyadh)', m[0].slice(0, 80))
+  for (const m of t.matchAll(/calendar\s*:\s*["']islamic["']|-ca-islamic(?!-umalqura|-civil|-tbla)\b/g)) push(doc, 'SC-19', 'P2', L(m.index), 'the generic islamic calendar: Saudi dates use islamic-umalqura', m[0])
+  for (const m of t.matchAll(/navigator\.languages?\b|accept-language/gi)) if (/location\.(href|replace|assign)|redirect\(|router\.(push|replace)/.test(t.slice(m.index, m.index + 300))) push(doc, 'SC-25', 'P1', L(m.index), 'redirect chosen from the browser language: offer the switch, never redirect by guess')
+  if (/formatRange\(/.test(t)) for (const m of t.matchAll(/numberingSystem\s*:/g)) push(doc, 'QA-10', 'P1', L(m.index), 'numberingSystem as an option: formatRange ignores it in V8 (put -u-nu-latn in the locale tag)', m[0])
   for (const m of t.matchAll(/\b(react-countup|CountUp|useCountUp)\b/g)) push(doc, 'MO-11', 'P2', L(m.index), 'count-up numbers')
 }
 
@@ -415,7 +440,7 @@ function copyRules(doc, sig, push, { isContent }) {
       if ((lang === 'ar' || lang === 'fa') !== isAr) continue
       for (const [id, phrases] of Object.entries(lists)) {
         for (const p of phrases) {
-          const hit = p.includes('.*') ? new RegExp(p, 'i').test(norm) : norm.includes(isAr ? stripTashkeel(p) : p)
+          const hit = p.includes('.*') ? new RegExp(isAr ? stripTashkeel(p) : p, 'i').test(norm) : norm.includes(isAr ? stripTashkeel(p) : p)
           if (!hit) continue
           const base = id === 'CP-08' ? 'P0' : id === 'CP-06' || id === 'CP-09' || id === 'CP-16' || id === 'CP-18' || id === 'LA-26' ? 'P2' : 'P1'
           push(doc, id, sev(base), s.line, `"${p}"${tag}`, text.slice(0, 80))
@@ -428,6 +453,12 @@ function copyRules(doc, sig, push, { isContent }) {
     if (sig.rtl && isAr && /[a-z\u0600-\u06FF]\s*→|→\s*$/.test(text)) push(doc, 'CP-10', 'P1', s.line, 'right-pointing arrow in Arabic text (forward is ←)', text.slice(0, 60))
     if (isAr && arabicShare(text) > 0.6 && /[\u0600-\u06FF]\s?[?;,](\s|$)/.test(text)) push(doc, 'SC-09', 'P2', s.line, 'Latin punctuation in Arabic text (use \u061F \u060C \u061B)', text.slice(0, 60))
     if (isAr && /[\u064a\u0643]/.test(text) && (faDoc ? true : count(text, /[\u067e\u0686\u0698\u06af\u06cc\u06a9]/g) > count(text, /[\u064a\u0643]/g))) push(doc, 'SC-09', 'P2', s.line, 'Arabic \u064a/\u0643 inside Persian text (use \u06cc/\u06a9)', text.slice(0, 60))
+    if (isAr) for (const m of text.matchAll(/[\u0621-\u064A]\/([\u0621-\u064A]{1,4})(?=[\s\u060C.\u061F!]|$)/g)) if (m[1] !== '\u0623\u0648') { push(doc, 'CP-20', sev('P1'), s.line, `slash-doubled gender "${m[0]}"${tag}`, text.slice(0, 60)); break }
+    if (isAr && arabicShare(text) > 0.6 && (/[\u0600-\u06FF]\s?&\s?[\u0600-\u06FF]/.test(text) || /[!\u061F]{2,}/.test(text))) push(doc, 'SC-09', 'P2', s.line, '"&" or doubled "!!"/"؟؟" in Arabic text (write «و»; one mark)', text.slice(0, 60))
+    if (/[\u0660-\u0669\u06F0-\u06F9]\s*[\u00B7\u2022\u2219]\s*[\u0660-\u0669\u06F0-\u06F9]/.test(text)) push(doc, 'SC-09', 'P1', s.line, 'a middle dot between Arabic-Indic digits reads as zero («٣·٥» looks like «٣٠٥»)', text.slice(0, 60))
+    if (isAr && (/(^|\s)\u0648\s+[\u0621-\u064A]{2,}/.test(text) || /(^|\s)\u0644\u0627(\u064A\u0648\u062C\u062F|\u064A\u0645\u0643\u0646)/.test(text))) push(doc, 'CP-21', sev('P2'), s.line, `orthography: a detached «و» or a merged «لايوجد/لايمكن»${tag}`, text.slice(0, 60))
+    if (isAr && /(\u0639\u0644\u0649|\u0641\u064A) (\u0627\u0644)?(\u064A\u0633\u0627\u0631|\u064A\u0645\u064A\u0646)|(\u0627\u0644\u0632\u0631|\u0627\u0644\u0642\u0627\u0626\u0645\u0629) (\u0627\u0644\u064A\u0633\u0631\u0649|\u0627\u0644\u064A\u0645\u0646\u0649)/.test(text)) push(doc, 'CP-22', sev('P2'), s.line, `a direction by side («على اليسار»): the side flips with the language; name the control instead${tag}`, text.slice(0, 60))
+    if (isAr && /\u0627\u0644\u0640?\s?[A-Za-z]{2,}/.test(text)) push(doc, 'CP-15', sev('P2'), s.line, `Arabic article on a Latin word ("الـAPI"): write the Arabic term, then the abbreviation${tag}`, text.slice(0, 60))
     if (isAr && (/\u0640{2,}/.test(text) || /[\u0621-\u064a]\u0640+[\u0621-\u064a]/.test(text))) push(doc, 'SC-16', 'P2', s.line, 'tatweel used for stretching', text.slice(0, 60))
     if (/[0-9]/.test(text) && /[\u0660-\u0669\u06F0-\u06F9]/.test(text)) push(doc, 'SC-07', 'P1', s.line, 'Western and Arabic-Indic digits in one string', text.slice(0, 60))
     if (/\b(\d{1,3}(,\d{3})+|\d+(\.\d+)?[kKmM]\+?)\s+(users|customers|teams|companies|downloads|clients)\b|\b99\.9+%|\b\d+(\.\d)?\/5\b|\btrusted by\b|\u0623\u0643\u062B\u0631 \u0645\u0646\s+[\d\u0660-\u0669]+\s+(\u0639\u0645\u064A\u0644|\u0645\u0633\u062A\u062E\u062F\u0645)/i.test(text)) push(doc, 'CP-07', owner ? 'P2' : 'P1', s.line, 'a metric or social proof: confirm the owner supplied it', text.slice(0, 80))

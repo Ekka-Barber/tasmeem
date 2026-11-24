@@ -20,6 +20,11 @@ For typographic, data-driven or templated motion (animated Arabic titles, a stat
 - Render at the target aspect ratios (16:9, 9:16, 1:1, 4:5). Every frame is reproducible from code.
 - If the Remotion skills are installed (`remotion-best-practices`, `remotion-create`, `remotion-render`), follow them for the API.
 
+## Captions and subtitles
+
+- Arabic captions follow the reading rules of the page: no tracking, `dir="rtl"` on the track's container, Arabic punctuation.
+- Netflix's Arabic timed-text guidance is a good default: at most two lines, about 42 characters per line, a reading speed of about 20 characters per second, and no line break between a preposition and its noun or between the two parts of an إضافة.
+
 ## On the page
 
 - `<video autoplay muted loop playsinline preload="metadata" poster="…">` for decorative loops, paused under reduced motion, with a pause control if longer than 5 seconds (MO-16).

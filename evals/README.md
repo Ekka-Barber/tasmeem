@@ -18,12 +18,16 @@ node evals/score.mjs                                        # scan + render ever
 ```
 
 - Outputs go to `evals/runs/<brief>/<variant>/` (git-ignored) with the full transcript (`transcript.json`).
-- `score.mjs` runs tasmeem's `scan` and `render` on each `index.html`, writes `evals/results.md` (P0/P1/P2 before and after, per brief) and the screenshots at 1440×900 and 390×844.
+- `score.mjs` runs tasmeem's `scan` and `render` on each `index.html`, writes `evals/results.md` (P0/P1/P2, time and image credits, per brief) and the screenshots: first screens at 1440×900 and 390×844, and the whole page at 1440.
 - Nothing is cherry-picked: every brief in `briefs/` is run and reported, including the ones where the baseline does well.
 
 ## Status
 
-Only `ar-roastery` has been run (the pilot); its results are in `results.md` and the README. The other briefs are ready for later runs.
+- **2026-11-24, tasmeem v0.2:** `ar-barber`, `ar-roastery` and `en-devtool` were run, both variants, and all three are reported in `results.md` and the README. Image credits spent: 9.5.
+- **2026-09-28, tasmeem v0.1:** the `ar-roastery` pilot (kept locally in `evals/runs-v0.1/`, git-ignored).
+- `ar-bindery` and `fa-bookstore` are ready for later runs.
+
+After running, `node evals/score.mjs` measures every run and `node evals/gallery.mjs` builds the comparison cards in `docs/before-after/`. Both take `--only <brief>`.
 
 ## Briefs
 

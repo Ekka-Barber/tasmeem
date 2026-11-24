@@ -3,9 +3,11 @@ node_modules/
 *.log
 .DS_Store
 evals/runs/
+evals/runs-v0.1/
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 
 # live task dashboard (local only)
 .dashboard/
+tasmeem-skill.zip

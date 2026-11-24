@@ -89,3 +89,14 @@ A fixed bottom bar with no `env(safe-area-inset-bottom)`, no space reserved unde
 An input, select or textarea set below 16 px. iOS zooms the whole page when it takes focus, and the layout stays zoomed.
 **Fix:** 16 px or more on every form control. Never fix it by disabling zoom (QA-06).
 **Sources:** IM
+
+### QA-20 · Labels in the wrong language · P1 · scan render
+An Arabic page whose `aria-label`, `title` or `placeholder` values are in English, or an English label with no `lang` on the element that carries it.
+**Why:** a screen reader reads the label with the page's voice: an Arabic voice spelling out English words, or nothing at all. NVDA and JAWS do not switch language for a focused control, so the label must already be in the page language.
+**Fix:** write labels in the page language. When a label must be in another language (a brand, a code), put `lang` on the element itself.
+**Sources:** WCAG 3.1.2, T
+
+### QA-21 · Broken hreflang · P1 · scan built
+Alternate-language links that search engines ignore: codes with underscores (`en_US`) or invented values, versions that do not list themselves, pairs that do not link back, and no `x-default` for a language picker page.
+**Fix:** every version lists every version, itself included, with ISO 639-1 codes and an optional region (`ar`, `ar-SA`, `en`), plus `x-default`. One language per URL (`/ar/…`, `/en/…`). See `scripts-lang/bilingual.md`.
+**Sources:** Google Search Central, T

@@ -10,6 +10,7 @@ tasmeem currently supports three languages and two scripts: Arabic and Persian (
 | [bidi.md](bidi.md) | mixing right-to-left and left-to-right: isolation, marks, inputs, icons |
 | [numerals-dates.md](numerals-dates.md) | digits, plurals, calendars, currency, weeks, names, addresses |
 | [punctuation.md](punctuation.md) | quotes, spacing and marks for the three languages |
+| [bilingual.md](bilingual.md) | sites in two languages: the switch, URLs, hreflang, `og:locale` |
 
 ## Rules for every page
 

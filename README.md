@@ -8,9 +8,9 @@ An agent skill for Claude Code, Codex, Cursor and any agent that reads `SKILL.md
 It builds, audits, critiques and polishes interfaces, checks its own work before handing it over,<br>
 and fills image slots with real assets instead of gradients.
 
-```text
-/plugin marketplace add Ekka-Barber/tasmeem
-```
+<a href="#install"><img alt="Install" src="https://img.shields.io/badge/Install-in%20one%20line-2f5d50?style=for-the-badge&logo=gnubash&logoColor=white"></a>
+<a href="https://github.com/Ekka-Barber/tasmeem/releases/latest/download/tasmeem-skill.zip"><img alt="Download tasmeem-skill.zip" src="https://img.shields.io/badge/Download-tasmeem--skill.zip-b0643a?style=for-the-badge&logo=github&logoColor=white"></a>
+<a href="#before-and-after"><img alt="See before and after" src="https://img.shields.io/badge/See-before%20%2F%20after-24292f?style=for-the-badge"></a>
 
 [![Tests](https://github.com/Ekka-Barber/tasmeem/actions/workflows/test.yml/badge.svg)](https://github.com/Ekka-Barber/tasmeem/actions/workflows/test.yml)
 [![Version](https://img.shields.io/github/package-json/v/Ekka-Barber/tasmeem?label=version&color=2f5d50)](CHANGELOG.md)
@@ -21,71 +21,50 @@ and fills image slots with real assets instead of gradients.
 ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-24292f)
 ![Node 18+](https://img.shields.io/badge/node-%E2%89%A518-24292f?logo=nodedotjs&logoColor=white)
 ![Dependencies: 0](https://img.shields.io/badge/dependencies-0-24292f)
-![Tells: 198](https://img.shields.io/badge/tells-198-b0643a)
-![Machine-checked: 126](https://img.shields.io/badge/machine--checked-126-b0643a)
+![Tells: 204](https://img.shields.io/badge/tells-204-b0643a)
+![Machine-checked: 134](https://img.shields.io/badge/machine--checked-134-b0643a)
 ![Languages](https://img.shields.io/badge/Arabic%20%C2%B7%20Persian%20%C2%B7%20English-RTL%20first-b0643a)
 
-[العربية](README.ar.md) · [Quick start](#quick-start) · [Modes](#modes) · [The scanner](#the-scanner) · [The gate](#the-gate) · [Languages](#arabic-persian-english) · [Real assets](#real-assets-with-higgsfield) · [FAQ](#faq) · [Changelog](CHANGELOG.md)
+[العربية](README.ar.md) · [Install](#install) · [Before / after](#before-and-after) · [Modes](#modes) · [The scanner](#the-scanner) · [The gate](#the-gate) · [Languages](#arabic-persian-english) · [Real assets](#real-assets-with-higgsfield) · [FAQ](#faq) · [Changelog](CHANGELOG.md)
 
 </div>
 
 ---
 
-## Before and after
+## Install
 
-The same brief, run twice in fresh headless Claude Code sessions: a one-page site for a small Riyadh roastery, with every fact supplied in the brief. One run had no skills; the other had tasmeem. Nothing was touched up afterwards.
+Pick the line for your agent. Each one installs the whole skill (SKILL.md, references, scanner, templates); there is nothing to build.
 
-<table>
-<tr><th width="50%">Without skills</th><th width="50%">With tasmeem</th></tr>
-<tr>
-<td><img src="docs/before-after/ar-roastery-before-desktop.png" alt="Without skills: cream ground, a red accented headline word, a pill badge and a hand-drawn SVG coffee bag"></td>
-<td><img src="docs/before-after/ar-roastery-after-desktop.png" alt="With tasmeem: green-coffee ground, a generated photograph of a roaster's cooling tray, a Kufi display name and an asymmetric split"></td>
-</tr>
-</table>
-
-| | Without skills | With tasmeem |
-|---|---|---|
-| Direction | cream ground, one headline phrase in red, a pill badge, three identical cards | green-coffee ground with roast-brown ink (the two states of the bean), an asymmetric split, prices set as a menu |
-| Images | a hand-drawn SVG bag | two comp mockups, then a generated photograph of a cooling tray and a transparent green-bean cutout, each with its provenance file |
-| Facts | as supplied | as supplied; the missing ones (a price per kilo) listed, not invented |
-| Measured by tasmeem (P0 · P1 · P2) | 2 · 9 · 1 | 0 · 8 · 0 |
-| Time, credits | 7 min | 18 min, 6.5 Higgsfield credits |
-
-The eight P1 findings in the tasmeem run are one real defect: the display face Kufam was set at label size, where the dot of a final ن disappears, so «العنوان» reads «العنوار». The eval exposed a gap in the rulebook, and TY-24 now catches it. The runs are reproducible with [`evals/run.mjs`](evals/run.mjs); results are in [`evals/results.md`](evals/results.md). This is one brief, not a benchmark.
-
-## Quick start
-
-<details open>
-<summary><b>Claude Code</b> (plugin)</summary>
+**Claude Code** (plugin, updates with the repo):
 
 ```text
 /plugin marketplace add Ekka-Barber/tasmeem
 /plugin install tasmeem@tasmeem
 ```
-</details>
 
-<details>
-<summary><b>Codex, Cursor, Gemini CLI and other agents</b> (skills CLI)</summary>
+**Codex, Cursor, Gemini CLI, Copilot, OpenCode and 70+ other agents** ([skills CLI](https://github.com/vercel-labs/skills); `-g` installs it for every project):
 
 ```bash
-npx skills add Ekka-Barber/tasmeem
+npx skills add Ekka-Barber/tasmeem -g
 ```
-</details>
 
-<details>
-<summary><b>Manual</b></summary>
+**Claude.ai and Claude Desktop** (upload): download [**tasmeem-skill.zip**](https://github.com/Ekka-Barber/tasmeem/releases/latest/download/tasmeem-skill.zip), then upload it under *Settings › Capabilities › Skills*.
 
-Copy `skills/tasmeem` into `~/.claude/skills/` (or your agent's skills folder). Nothing to build.
-</details>
-
-<details>
-<summary><b>Optional extras</b>: a real browser for checks, and image generation</summary>
+**Manual** (any agent that reads a skills folder):
 
 ```bash
-npm i -D playwright && npx playwright install chromium   # real-browser checks (render)
-npm i -g @higgsfield/cli && higgsfield auth login        # image assets (uses your Higgsfield credits)
+git clone --depth 1 https://github.com/Ekka-Barber/tasmeem && cp -r tasmeem/skills/tasmeem ~/.claude/skills/
 ```
-</details>
+
+```powershell
+git clone --depth 1 https://github.com/Ekka-Barber/tasmeem; Copy-Item -Recurse tasmeemskills	asmeem $HOME.claudeskills```
+
+**Optional extras**: a real browser for the render check, and image generation for the asset mode:
+
+```bash
+npm i -D playwright                                 # uses Playwright's Chromium, or your installed Chrome or Edge
+npm i -g @higgsfield/cli && higgsfield auth login   # image assets (spends your Higgsfield credits, never without a budget)
+```
 
 Then talk to your agent as usual. tasmeem picks the mode from what you ask:
 
@@ -97,6 +76,41 @@ Harden the checkout: empty states, errors, long names, slow network.
 صمّم صفحة حجز لصالون حلاقة في الرياض
 راجع واجهة التطبيق وقل لي ما الذي يبدو مصنوعاً بالذكاء الاصطناعي
 ```
+
+## Before and after
+
+Three briefs, each run twice in fresh headless Claude Code sessions with the same model and the same facts: once with no skills, once with tasmeem v0.2. Every brief that was run is shown, and nothing was touched up afterwards. The numbers under each screen are tasmeem's own measurements (scan and a real-browser render at 390 and 1440 px).
+
+| Brief | Without skills (P0 · P1 · P2) | With tasmeem (P0 · P1 · P2) | Time with tasmeem | Image credits |
+|---|---|---|---|---|
+| Arabic booking page, Riyadh barbershop | **2** · 4 · 1 | **0** · 0 · 0 | 12 min | 2.75 |
+| Arabic landing page, Riyadh roastery | 0 · 5 · 1 | 0 · 1 · 0 | 12 min | 4.5 |
+| English landing page, Postgres migration CLI | **3** · 6 · 1 | **0** · 1 · 0 | 19 min | 2.25 |
+
+<p align="center"><img src="docs/before-after/ar-barber-compare.jpg" alt="Barbershop booking page. Without skills: cream ground, an accented headline word, clipped Arabic line height, 2 P0 and 4 P1. With tasmeem: a dark green photograph of a hot towel and straight razor, the booking form as the page, 0 findings." width="100%"></p>
+
+<p align="center"><img src="docs/before-after/ar-roastery-compare.jpg" alt="Roastery landing page. Without skills: a dark brown hero with an eyebrow, cream sections, raw colours, small targets. With tasmeem: a photograph of green and roasted beans in one bowl beside a Ruqaa headline, 1 P1." width="100%"></p>
+
+<p align="center"><img src="docs/before-after/en-devtool-compare.jpg" alt="Postgres migration CLI landing page. Without skills: cream ground, an eyebrow, numbered sections, tight line height, 3 P0. With tasmeem: a night photograph of railway points beside the headline and install commands, 1 P1." width="100%"></p>
+
+<details>
+<summary><b>Whole pages</b>: scroll every run top to bottom</summary>
+
+**Barbershop booking**
+
+<table><tr><th width="50%">Without skills, whole page</th><th width="50%">With tasmeem, whole page</th></tr><tr><td valign="top"><img src="docs/before-after/ar-barber-before-full.jpg" alt="Whole page without skills"></td><td valign="top"><img src="docs/before-after/ar-barber-after-full.jpg" alt="Whole page with tasmeem"></td></tr></table>
+
+**Roastery**
+
+<table><tr><th width="50%">Without skills, whole page</th><th width="50%">With tasmeem, whole page</th></tr><tr><td valign="top"><img src="docs/before-after/ar-roastery-before-full.jpg" alt="Whole page without skills"></td><td valign="top"><img src="docs/before-after/ar-roastery-after-full.jpg" alt="Whole page with tasmeem"></td></tr></table>
+
+**Postgres migration CLI**
+
+<table><tr><th width="50%">Without skills, whole page</th><th width="50%">With tasmeem, whole page</th></tr><tr><td valign="top"><img src="docs/before-after/en-devtool-before-full.jpg" alt="Whole page without skills"></td><td valign="top"><img src="docs/before-after/en-devtool-after-full.jpg" alt="Whole page with tasmeem"></td></tr></table>
+
+</details>
+
+What the remaining findings are: on the roastery, a font named in the CSS but never loaded (TY-17); on the CLI page, monospace used beyond code (TY-14), which a terminal tool can defend. The "without" runs were faster (2 to 3 minutes), because they skip the direction, the image plates and the gate. Three briefs are a demonstration, not a benchmark; the runs are reproducible with [`evals/run.mjs`](evals/run.mjs), and [`evals/results.md`](evals/results.md) has the tells per run.
 
 ## Why
 
@@ -111,8 +125,8 @@ tasmeem fixes this at the source. It decides a direction before it draws, sets t
 | | |
 |---|---|
 | **Direction before pixels** | A design read, the surface type (persuade, operate, read, experience), a scene sentence, the subject's own world, three dials, a colour strategy, one signature element, then a check for first- and second-order reflexes, with the rut named and left on purpose. |
-| **198 tells, one rulebook** | The patterns that a dozen independent design skills and guides agree make an interface look generated, merged and rewritten, with their conflicts resolved once. Each tell has a severity, a fix and the conditions under which it is allowed. |
-| **Evidence, not vibes** | A zero-dependency scanner reports 126 of those tells with file and line. An optional real-browser check reads computed styles: contrast on the actual background, the fonts actually drawn, overflow, held animations. |
+| **204 tells, one rulebook** | The patterns that independent design skills, style guides and Gulf government design systems agree make an interface look generated, merged and rewritten, with their conflicts resolved once. Each tell has a severity, a fix and the conditions under which it is allowed. |
+| **Evidence, not vibes** | A zero-dependency scanner reports 134 of those tells with file and line. An optional real-browser check reads computed styles: contrast on the actual background, the fonts actually drawn, overflow, held animations. |
 | **A gate that blocks the right things** | Three tiers (Floor, Reflex, Finish), a click-through of every control, and a fresh-eyes review by an agent that did not see the build. |
 | **Arabic first** | Arabic type, direction, digits, plurals, calendars, bidi, forms, voice and copy; direction-aware JavaScript; Persian (ی and ک, ZWNJ, Persian digits, the Solar Hijri calendar); English, and pairing it with Arabic-script faces. |
 | **The platform before a library** | A support table for the native features of late 2026 (anchor positioning, popovers, `@starting-style`, scroll-driven animation, View Transitions, `contrast-color()`…), each with its fallback. |
@@ -178,16 +192,16 @@ A brand's own choices go in `DESIGN.md` under **Brand exceptions** (`CO-03: the 
 
 | Category | Tells | Examples |
 |---|---|---|
-| Colour `CO` | 18 | purple-to-blue gradient, unchosen indigo, cream by default, gradient text, glow, the opacity ladder |
+| Colour `CO` | 17 | purple-to-blue gradient, unchosen indigo, cream by default, gradient text, glow, the opacity ladder |
 | Type `TY` | 25 | Inter for everything, the tasteful-font cluster, italic display, the accented headline word, eyebrows, display faces at text size |
 | Layout `LA` | 26 | the centred hero, three icon cards, the stat strip, 01/02/03 scaffolding, overflow, two-state layouts |
 | Components `CM` | 24 | kit defaults, glass by reflex, side stripes, icon chips, redrawn chrome, dead controls, the default dashboard shell |
 | Motion `MO` | 21 | one fade-up for everything, bounce, `transition: all`, animated layout, reduced motion as a kill switch |
-| Copy `CP` | 19 | buzzwords in three languages, "not X but Y", invented metrics, placeholders, translation-shaped Arabic, chatbot residue |
+| Copy `CP` | 22 | buzzwords in three languages, "not X but Y", invented metrics, translation-shaped Arabic, chatbot residue, «أدخل/ي» |
 | Imagery `IG` | 14 | stock people, the generated-illustration look, placeholders, drawn stand-ins, garbled text in generated images |
 | System `SY` | 10 | design-system drift, sameness, a famous product's skin, the template stack |
-| Quality `QA` | 19 | contrast, focus, headings, `lang`, targets, zoom, forms, mouse-only gestures, inputs under 16 px |
-| Scripts `SC` | 22 | tracked Arabic, fake italics, line-height floors, fallback glyphs, physical CSS in RTL, ligatures off, direction-blind code |
+| Quality `QA` | 21 | contrast, focus, headings, `lang`, targets, zoom, forms, inputs under 16 px, labels in the wrong language, hreflang |
+| Scripts `SC` | 24 | tracked Arabic, fake italics, line-height floors, fallback glyphs, physical CSS in RTL, ligatures off, direction-blind code, double reversal, the language switch |
 
 ## The gate
 
@@ -210,7 +224,7 @@ It measures, captures 390 and 1440 px (plus 360 for overflow), clicks every cont
 
 | Language | What tasmeem knows |
 |---|---|
-| **Arabic** | Naskh, Kufi, Ruqaa and display roles; families, their axes and Latin partners; size balancing with per-script `size-adjust`; line heights (and Tailwind's `leading-*`); never tracking, italics, case or disabled ligatures; display faces kept large; «، ؛ ؟»; the digit policy and digit-safe inputs; six plural forms by n mod 100; Hijri and Gregorian; the week start per country (Sunday in Saudi Arabia); three-decimal currencies; the new riyal sign U+20C1 and how to render it; the Saudi national address; bidi islands; direction-aware JavaScript and Radix/shadcn; the "Arabic costume" reflex |
+| **Arabic** | Naskh, Kufi, Ruqaa and display roles; families, their axes and Latin partners; size balancing with per-script `size-adjust`; line heights (and Tailwind's `leading-*`); never tracking, italics, case or disabled ligatures; display faces kept large; «، ؛ ؟»; the digit policy and digit-safe inputs; six plural forms by n mod 100; Hijri and Gregorian; the week start per country (Sunday in Saudi Arabia); three-decimal currencies; the new riyal sign U+20C1 and how to render it; the Saudi national address and Nafath sign-in; the DGA, UAE and Dubai government type systems; bilingual sites (the switch, URLs, hreflang); bidi islands and isolates; direction-aware JavaScript, Radix/shadcn, Chart.js and ECharts; the "Arabic costume" reflex |
 | **Persian** | ی and ک (never ي and ك), ZWNJ in compounds, Extended Arabic-Indic digits and separators, the Solar Hijri calendar, Nastaliq kept to display and poetry, Persian machine-copy tells |
 | **English** | coverage, case and hyphenation with `lang`, tracking limits, measure, curly punctuation, sentence case, and matching the Latin partner to an Arabic or Persian face |
 
@@ -242,7 +256,7 @@ skills/tasmeem/
 ├─ SKILL.md                 router: setup, non-negotiables, routes, the tells to keep in mind (under 100 lines)
 ├─ references/
 │  ├─ core/                 direction · honesty · the delivery gate
-│  ├─ tells/                198 tells in 10 categories: severity, fix, allowed-when, sources
+│  ├─ tells/                204 tells in 10 categories: severity, fix, allowed-when, sources
 │  ├─ scripts-lang/         Arabic, Persian, English, bidi, numerals and dates, punctuation
 │  ├─ craft/                type · colour · layout · components · forms · a11y and performance · the platform in 2026
 │  ├─ motion/               principles · techniques · produced video
@@ -290,7 +304,7 @@ Then write it in `DESIGN.md` under Brand exceptions. tasmeem reports it as an ex
 ## Tests and contributing
 
 ```bash
-npm test      # node:test: 24 tests over fixtures (AI slop, Arabic slop, Persian copy, Tailwind, a clean Arabic page)
+npm test      # node:test: 28 tests over fixtures (AI slop, Arabic slop, Persian copy, Tailwind, a clean Arabic page)
 ```
 
 New tells, phrase lists and fixes are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Every detector needs a fixture that triggers it and one that does not.

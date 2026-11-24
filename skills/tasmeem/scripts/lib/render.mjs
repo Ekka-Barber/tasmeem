@@ -17,6 +17,17 @@ export async function loadPlaywright(from = process.cwd()) {
   return null
 }
 
+/** Launch Chromium; when Playwright's own build is missing, use the installed Chrome or Edge instead of failing. */
+export async function launchBrowser(pw) {
+  try { return await pw.chromium.launch({ headless: true }) } catch (e) {
+    if (!/Executable doesn't exist|browserType.launch/.test(String(e.message))) throw e
+    for (const channel of [process.env.TASMEEM_BROWSER, 'chrome', 'msedge'].filter(Boolean)) {
+      try { return await pw.chromium.launch({ headless: true, channel }) } catch {}
+    }
+    throw e
+  }
+}
+
 /**
  * @param {string} url
  * @param {{widths?: number[], motion?: boolean, out?: string, from?: string, screenshots?: boolean}} opts
@@ -26,7 +37,7 @@ export async function checkRender(url, { widths = [360, 768, 1024, 1440], motion
   if (!pw) {
     return { tool: 'render', error: 'playwright-missing', findings: [], message: 'Playwright is not installed. Run: npm i -D playwright && npx playwright install chromium (or npm i -g playwright). Render-only tells are unverified until then.' }
   }
-  const browser = await pw.chromium.launch({ headless: true })
+  const browser = await launchBrowser(pw)
   const findings = []
   const meta = { url, widths, screenshots: [], fonts: {}, scripts: [] }
   if (screenshots) mkdirSync(out, { recursive: true })

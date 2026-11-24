@@ -42,6 +42,9 @@ Design them together, in one place (see CM-07).
 - Tabular figures, aligned decimal places, units in the header.
 - Show real data or no chart (CM-20). Label axes in the page language, and decide the RTL direction for time.
 - Empty state: what this area will contain, and the one action that fills it.
+- A static chart is an image with meaning: `role="img"`, an `aria-label` that states the purpose and the key finding, and an `aria-describedby` summary or a data table. Interactive points are focusable.
+- Keep series readable: about six slices in a pie and three series in a line or bar chart; beyond that, group or split.
+- **Date pickers:** on open, focus the selected date (or today); arrow keys move by day, Enter selects, Escape closes; announce month changes in an `aria-live` region. Offer the Hijri calendar where the audience uses it, and typed input as well as the grid.
 
 ## Icons
 

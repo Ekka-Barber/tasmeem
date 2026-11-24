@@ -20,8 +20,11 @@
 [![Version](https://img.shields.io/github/package-json/v/Ekka-Barber/tasmeem?label=version&color=2f5d50)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/github/license/Ekka-Barber/tasmeem?color=2f5d50)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/Ekka-Barber/tasmeem?color=2f5d50)](https://github.com/Ekka-Barber/tasmeem/commits/main)
-![Tells: 198](https://img.shields.io/badge/tells-198-b0643a)
-![Machine-checked: 126](https://img.shields.io/badge/machine--checked-126-b0643a)
+![Tells: 204](https://img.shields.io/badge/tells-204-b0643a)
+![Machine-checked: 134](https://img.shields.io/badge/machine--checked-134-b0643a)
+
+<a href="#التثبيت"><img alt="Install" src="https://img.shields.io/badge/%D8%A7%D9%84%D8%AA%D8%AB%D8%A8%D9%8A%D8%AA-%D8%A8%D8%B3%D8%B7%D8%B1%20%D9%88%D8%A7%D8%AD%D8%AF-2f5d50?style=for-the-badge"></a>
+<a href="https://github.com/Ekka-Barber/tasmeem/releases/latest/download/tasmeem-skill.zip"><img alt="Download tasmeem-skill.zip" src="https://img.shields.io/badge/%D8%AA%D9%86%D8%B2%D9%8A%D9%84-tasmeem--skill.zip-b0643a?style=for-the-badge&logo=github&logoColor=white"></a>
 
 [English](README.md) · [CHANGELOG](CHANGELOG.md) · [CREDITS](CREDITS.md)
 
@@ -31,33 +34,11 @@
 
 ---
 
-## قبل وبعد
-
-شغّلنا الطلب نفسه مرتين في جلستين جديدتين من Claude Code: صفحة لمحمصة صغيرة في الرياض، وكل حقائقها مذكورة في الطلب. الأولى بلا أي مهارة، والثانية مع تصميم. لم نعدّل شيئاً بعدها.
-
-</div>
-
-<table>
-<tr><th width="50%">بلا مهارات</th><th width="50%">مع تصميم</th></tr>
-<tr>
-<td><img src="docs/before-after/ar-roastery-before-desktop.png" alt="بلا مهارات: خلفية كريمية وكلمة ملوّنة في العنوان وشارة وكيس قهوة مرسوم"></td>
-<td><img src="docs/before-after/ar-roastery-after-desktop.png" alt="مع تصميم: خلفية بلون البن الأخضر وصورة مولَّدة لصينية تبريد المحمصة وعنوان بخط كوفي"></td>
-</tr>
-</table>
-
-<div dir="rtl" align="right">
-
-| | بلا مهارات | مع تصميم |
-|---|---|---|
-| الاتجاه | خلفية كريمية، وعبارة ملوّنة في العنوان، وشارة، وثلاث بطاقات متطابقة | لون البن الأخضر مع حبر بني التحميص (حالتا الحبة)، وتقسيم غير متماثل، وأسعار على هيئة لوحة |
-| الصور | كيس مرسوم بـSVG | تصوّران للصفحة، ثم صورة مولَّدة لصينية التبريد وحبوب خضراء مفرّغة، ولكل صورة ملف مصدر |
-| الحقائق | كما وردت | كما وردت، والناقص منها (سعر الكيلو) في قائمة، لا مخترَع |
-| القياس (P0 · P1 · P2) | 2 · 9 · 1 | 0 · 8 · 0 |
-| الوقت والرصيد | 7 دقائق | 18 دقيقة، و6.5 رصيد من Higgsfield |
-
-الملاحظات الثماني في نسخة تصميم عيبٌ حقيقي واحد: استُخدم خط العرض Kufam في مقاس صغير، فسقطت نقطة النون الأخيرة وصارت «العنوان» تُقرأ «العنوار». كشفت التجربة ثغرة في القواعد، وصارت القاعدة TY-24 ترصدها الآن. هذه تجربة واحدة، لا مقياس شامل.
-
 ## التثبيت
+
+اختر السطر الخاص بوكيلك. كل سطر يثبّت المهارة كاملة (SKILL.md والمراجع والفاحص والقوالب)، ولا شيء يحتاج إلى بناء.
+
+**Claude Code** (إضافة تتحدّث مع المستودع):
 
 </div>
 
@@ -66,13 +47,76 @@
 /plugin install tasmeem@tasmeem
 ```
 
+<div dir="rtl" align="right">
+
+**Codex وCursor وGemini CLI وCopilot وOpenCode وأكثر من ٧٠ وكيلاً** (أداة skills، والخيار `-g` يثبّتها لكل المشاريع):
+
+</div>
+
 ```bash
-npx skills add Ekka-Barber/tasmeem                       # Codex وCursor وغيرهما
-npm i -D playwright && npx playwright install chromium   # اختياري: فحص في متصفح حقيقي
-npm i -g @higgsfield/cli && higgsfield auth login        # اختياري: توليد الصور (يستهلك رصيدك في Higgsfield)
+npx skills add Ekka-Barber/tasmeem -g
 ```
 
 <div dir="rtl" align="right">
+
+**Claude.ai وتطبيق Claude لسطح المكتب** (رفع ملف): نزّل [**tasmeem-skill.zip**](https://github.com/Ekka-Barber/tasmeem/releases/latest/download/tasmeem-skill.zip) ثم ارفعه من *الإعدادات › القدرات › المهارات*.
+
+**يدوياً** (لأي وكيل يقرأ مجلد مهارات):
+
+</div>
+
+```bash
+git clone --depth 1 https://github.com/Ekka-Barber/tasmeem && cp -r tasmeem/skills/tasmeem ~/.claude/skills/
+```
+
+```powershell
+git clone --depth 1 https://github.com/Ekka-Barber/tasmeem; Copy-Item -Recurse tasmeemskills	asmeem $HOME.claudeskills```
+
+<div dir="rtl" align="right">
+
+**إضافات اختيارية:** متصفح حقيقي للفحص، وتوليد الصور لوضع المواد:
+
+</div>
+
+```bash
+npm i -D playwright                                 # يستخدم Chromium أو Chrome أو Edge المثبّت عندك
+npm i -g @higgsfield/cli && higgsfield auth login   # توليد الصور (يستهلك رصيدك، ولا يصرف دون ميزانية)
+```
+
+<div dir="rtl" align="right">
+
+## قبل وبعد
+
+ثلاثة طلبات، شغّلنا كلاً منها مرتين في جلستين جديدتين من Claude Code بالنموذج نفسه والحقائق نفسها: مرة بلا أي مهارة، ومرة مع تصميم v0.2. عرضنا كل ما شغّلناه، ولم نعدّل شيئاً بعده. الأرقام تحت كل شاشة من قياس تصميم نفسها (فحص المصدر وفحص في متصفح حقيقي بعرض 390 و1440 بكسل).
+
+| الطلب | بلا مهارات (P0 · P1 · P2) | مع تصميم (P0 · P1 · P2) | الوقت مع تصميم | رصيد الصور |
+|---|---|---|---|---|
+| صفحة حجز لصالون حلاقة في الرياض | **2** · 4 · 1 | **0** · 0 · 0 | 12 دقيقة | 2.75 |
+| صفحة لمحمصة قهوة في الرياض | 0 · 5 · 1 | 0 · 1 · 0 | 12 دقيقة | 4.5 |
+| صفحة إنجليزية لأداة ترحيل قواعد Postgres | **3** · 6 · 1 | **0** · 1 · 0 | 19 دقيقة | 2.25 |
+
+</div>
+
+<p align="center"><img src="docs/before-after/ar-barber-compare.jpg" alt="صفحة حجز الصالون: بلا مهارات ملاحظتان حرجتان وأربع، ومع تصميم صفر" width="100%"></p>
+
+<p align="center"><img src="docs/before-after/ar-roastery-compare.jpg" alt="صفحة المحمصة: بلا مهارات خمس ملاحظات، ومع تصميم ملاحظة واحدة" width="100%"></p>
+
+<p align="center"><img src="docs/before-after/en-devtool-compare.jpg" alt="صفحة أداة Postgres: بلا مهارات ثلاث ملاحظات حرجة، ومع تصميم ملاحظة واحدة" width="100%"></p>
+
+<details>
+<summary><b>الصفحات كاملة</b></summary>
+
+<table><tr><th width="50%">بلا مهارات، الصفحة كاملة</th><th width="50%">مع تصميم، الصفحة كاملة</th></tr><tr><td valign="top"><img src="docs/before-after/ar-barber-before-full.jpg" alt="الصفحة كاملة بلا مهارات"></td><td valign="top"><img src="docs/before-after/ar-barber-after-full.jpg" alt="الصفحة كاملة مع تصميم"></td></tr></table>
+
+<table><tr><th width="50%">بلا مهارات، الصفحة كاملة</th><th width="50%">مع تصميم، الصفحة كاملة</th></tr><tr><td valign="top"><img src="docs/before-after/ar-roastery-before-full.jpg" alt="الصفحة كاملة بلا مهارات"></td><td valign="top"><img src="docs/before-after/ar-roastery-after-full.jpg" alt="الصفحة كاملة مع تصميم"></td></tr></table>
+
+<table><tr><th width="50%">بلا مهارات، الصفحة كاملة</th><th width="50%">مع تصميم، الصفحة كاملة</th></tr><tr><td valign="top"><img src="docs/before-after/en-devtool-before-full.jpg" alt="الصفحة كاملة بلا مهارات"></td><td valign="top"><img src="docs/before-after/en-devtool-after-full.jpg" alt="الصفحة كاملة مع تصميم"></td></tr></table>
+
+</details>
+
+<div dir="rtl" align="right">
+
+الملاحظتان الباقيتان: في المحمصة خطٌّ مذكور في CSS لم يُحمَّل (TY-17)، وفي صفحة الأداة خطٌّ أحادي المسافة خارج الشيفرة (TY-14)، وله وجه في أداة سطر أوامر. هذه ثلاث تجارب للعرض لا مقياس شامل، ويمكن إعادتها بـ[`evals/run.mjs`](evals/run.mjs).
 
 ## الاستخدام
 
@@ -110,8 +154,8 @@ npm i -g @higgsfield/cli && higgsfield auth login        # اختياري: تو�
 ## ماذا تفعل
 
 - **الاتجاه قبل الرسم:** قراءة للمطلوب ونوع الشاشة (إقناع، تشغيل، قراءة، تجربة)، وجملة تصف مشهد الاستخدام، ومفردات من عالم المنتج نفسه، وثلاثة مؤشرات، واستراتيجية للألوان، وعنصر واحد يميّز التصميم. ثم نسمّي الخطة البديهية ونقيضها المتوقع، ونبتعد عنهما عن قصد.
-- **١٩٨ علامة في كتاب قواعد واحد:** الأنماط التي تفضح التصميم المولَّد، كما اتفقت عليها مهارات ومراجع مستقلة، مدموجةً ومعاد صياغتها، وتعارضاتها محسومة مرة واحدة.
-- **دليلٌ لا انطباع:** فاحص بلا أي اعتماديات يرصد ١٢٦ علامة منها بالملف والسطر، وفحص اختياري في متصفح حقيقي يقرأ الأنماط المحسوبة: التباين على الخلفية الفعلية، والخط المرسوم فعلاً، والفيضان الأفقي، والحركات العالقة.
+- **٢٠٤ علامات في كتاب قواعد واحد:** الأنماط التي تفضح التصميم المولَّد، كما اتفقت عليها مهارات ومراجع مستقلة، مدموجةً ومعاد صياغتها، وتعارضاتها محسومة مرة واحدة.
+- **دليلٌ لا انطباع:** فاحص بلا أي اعتماديات يرصد ١٣٤ علامة منها بالملف والسطر، وفحص اختياري في متصفح حقيقي يقرأ الأنماط المحسوبة: التباين على الخلفية الفعلية، والخط المرسوم فعلاً، والفيضان الأفقي، والحركات العالقة.
 - **بوابة تمنع ما يجب منعه فقط:** ثلاث طبقات (الحد الأدنى، والعادات الآلية، واللمسات)، وتجربة كل زر ورابط بيدنا، ومراجعة من وكيل لم يرَ البناء.
 - **المنصة قبل المكتبة:** جدول بما تدعمه المتصفحات أواخر ٢٠٢٦ (التموضع بالمرساة، والنوافذ المنبثقة، و`@starting-style`، والحركة بالتمرير، وانتقالات العرض…) مع البديل لكل ميزة.
 - **صور حقيقية:** مع Higgsfield تعمل تصميم كما يعمل الاستوديو: تصوّر كامل للصفحة، ثم خريطة للمناطق، ثم مواد مولَّدة لكل منطقة، ثم شيفرة تطابق التصوّر. وبوابة تكلفة قبل كل توليد، وملف مصدر لكل صورة.
@@ -130,6 +174,9 @@ npm i -g @higgsfield/cli && higgsfield auth login        # اختياري: تو�
 - بداية الأسبوع تختلف بين الدول: الأحد في السعودية، والسبت في مصر والكويت، والإثنين في الإمارات.
 - رمز الريال الجديد (U+20C1) وطريقة عرضه بخط خاص، والعملات ذات المنازل العشرية الثلاث.
 - الخصائص المنطقية بدل الجهات الفيزيائية، وعكس الأيقونات حسب المعنى: «التالي» يشير إلى اليسار. وجافاسكربت يعرف الاتجاه أيضاً: التمرير والأسهم والسحب و`DirectionProvider` في Radix وshadcn.
+- أنظمة التصميم الحكومية في الخليج: خطوط هيئة الحكومة الرقمية والإمارات ودبي ومقاساتها، والخط السعودي للعناوين في المناسبات الوطنية فقط، ولا ختم حكومي على موقع لا يملكه.
+- المواقع ثنائية اللغة: زر اللغة باسمها لا بعلم، ويفتح الصفحة نفسها باللغة الأخرى، ورابط مستقل لكل لغة، وhreflang صحيح، ولا تحويل تلقائي بالتخمين.
+- قارئ الشاشة: تسميات `aria-label` بلغة الصفحة، ولا «أدخل/ي» بشرطة مائلة، والتشكيل حيث قد يخطئ الصوت في القراءة.
 - لا نص عربياً داخل صورة مولَّدة، والشعارات والخط العربي بصيغة متجهة دائماً.
 - وأخيراً: لا «زيّ عربي» جاهز من فوانيس وقباب ونجوم ثمانية وذهبي على كحلي. الهوية تُبنى من عالم المنتج الحقيقي: حيّه ومواده وناسه وحرفته.
 
@@ -141,7 +188,7 @@ npm i -g @higgsfield/cli && higgsfield auth login        # اختياري: تو�
 node skills/tasmeem/scripts/tasmeem.mjs scan src/                    # المصدر
 node skills/tasmeem/scripts/tasmeem.mjs render http://localhost:3000  # متصفح حقيقي
 node skills/tasmeem/scripts/tasmeem.mjs kept old/src src             # ما الذي سقط في إعادة التصميم؟
-npm test                                                             # ٢٤ اختباراً
+npm test                                                             # ٢٨ اختباراً
 ```
 
 <div dir="rtl" align="right">

@@ -133,3 +133,40 @@ test('v0.2 tuning: display-sized Arabic may use leading-tight; test files are no
   const t = scanDocs([{ file: 'x.test.tsx', rel: 'src/__tests__/x.test.tsx', text: '<form onSubmit={() => {}}><a href="#">x</a></form>' }]).findings.map((x) => x.id)
   assert.ok(!t.includes('CM-21'))
 })
+
+test('v0.2.1 Gulf guides: slash gender, wrong-language labels, hreflang, flags, formatRange, Arabic & and !!', () => {
+  const html = `<html lang="ar" dir="rtl"><head><link rel="alternate" hreflang="en_US" href="/en"></head>
+    <p>أدخل/ي رقم الجوال</p><p>و/أو اختر الخدمة</p><button aria-label="Open the menu">☰</button><button aria-label="Open the menu" lang="en">☰</button>
+    <a href="/en">🇺🇸 English</a><a href="/?lang=en">English</a><p>القهوة & الحلويات!!</p><p>أرسل الـAPI key عبر الإيميل</p><p>منصة مسجل لدى هيئة الحكومة الرقمية</p></html>`
+  const js = `const f = new Intl.NumberFormat('ar-SA', { numberingSystem: 'latn' }); f.formatRange(1, 5); if (navigator.language.startsWith('en')) location.replace('/en')`
+  const got = scanDocs([{ file: 'p.html', rel: 'p.html', text: html }, { file: 'l.js', rel: 'l.js', text: js }]).findings
+  const ids = got.map((f) => f.id)
+  for (const id of ['CP-20', 'QA-20', 'QA-21', 'SC-25', 'SC-09', 'CP-15', 'CP-07', 'QA-10']) assert.ok(ids.includes(id), `expected ${id}`)
+  assert.equal(got.filter((f) => f.id === 'CP-20').length, 1, '«و/أو» is not slash gender')
+  assert.equal(got.filter((f) => f.id === 'QA-20').reduce((n, f) => n + (f.count || 1), 0), 1, 'a label with lang="en" is fine')
+})
+
+test('v0.2.1: Arabic body line-height 1.5 (government standard) is advisory, 1.3 is P0', () => {
+  const sev = (lh) => scanDocs([{ file: 'a.css', rel: 'a.css', text: `:lang(ar) p { line-height: ${lh}; }` }, { file: 'i.html', rel: 'i.html', text: '<html lang="ar" dir="rtl"><p>نص</p></html>' }]).findings.find((f) => f.id === 'SC-03')?.severity
+  assert.equal(sev('1.5'), 'P2')
+  assert.equal(sev('1.3'), 'P0')
+  assert.equal(sev('1.7'), undefined)
+})
+
+test('v0.2.1 Arabic repos: double reversal, small Arabic, drawers, centring, digits, orthography, directions, dates', () => {
+  const css = `.nav { left: 50%; transform: translateX(-50%); } .drawer { transform: translateX(-100%); } [dir="rtl"] .row { flex-direction: row-reverse; } :lang(ar) .note { font-size: 12px; }`
+  const html = `<html lang="ar" dir="rtl"><head><meta property="og:locale" content="ar-SA"></head><style>${css}</style>
+    <div class="flex rtl:flex-row-reverse"><p class="text-xs">نص صغير جداً</p></div><input name="code" pattern="[0-9]{4}">
+    <p>السعر ٣·٥ ريال</p><p>لايوجد طلبات و الحجز مغلق</p><p>اضغط الزر على اليسار</p></html>`
+  const js = `useEffect(() => { document.documentElement.dir = 'rtl' }, []); const f = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { dateStyle: 'long' })`
+  const got = scanDocs([{ file: 'p.html', rel: 'p.html', text: html }, { file: 'a.js', rel: 'a.js', text: js }]).findings
+  const ids = new Set(got.map((f) => f.id))
+  for (const id of ['SC-26', 'TY-13', 'SC-05', 'SC-23', 'QA-21', 'SC-09', 'CP-21', 'CP-22', 'SC-24', 'QA-10', 'SC-19']) assert.ok(ids.has(id), `expected ${id}`)
+  assert.ok(!got.some((f) => f.id === 'SC-05' && /physical left/.test(f.message)), 'left: 50% with translateX(-50%) is centring, not a side')
+  assert.ok(got.some((f) => f.id === 'SC-05' && /off-canvas/.test(f.message)))
+})
+
+test('v0.2.1: new Arabic machine-copy phrases', () => {
+  const ids = scanDocs([{ file: 'i.html', rel: 'i.html', text: '<html lang="ar" dir="rtl"><p>من الجدير بالذكر أن هذا التطبيق يعد واحداً من أهم الحلول</p><p>في عالمنا الرقمي اليوم</p><p>عدّل الملف الخاص بك</p></html>' }]).findings.map((f) => f.id)
+  for (const id of ['CP-16', 'CP-17', 'CP-01', 'CP-15']) assert.ok(ids.includes(id), `expected ${id}`)
+})

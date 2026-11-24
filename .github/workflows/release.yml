@@ -1,0 +1,20 @@
+name: release
+
+# Every published release gets the installable skill as tasmeem-skill.zip
+# (the README's download link points at releases/latest/download/tasmeem-skill.zip).
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git archive --format=zip --prefix=tasmeem/ -o tasmeem-skill.zip HEAD:skills/tasmeem
+      - run: gh release upload "${{ github.event.release.tag_name }}" tasmeem-skill.zip --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

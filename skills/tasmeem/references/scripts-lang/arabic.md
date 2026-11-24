@@ -18,7 +18,8 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | Style | Job | Never use it for |
 |---|---|---|
 | **Naskh** | reading: body, long text, forms | nothing; it is the safe base |
-| **Kufi (geometric)** | interface, display, short labels, signage | long reading at small sizes |
+| **Kufi, text cut** (Noto Kufi Arabic, IBM Plex Sans Arabic) | interface and body text at 16 px and up | nothing at sizes it was drawn for |
+| **Kufi, display cut** (Kufam, Reem Kufi, Rakkas…) | display, short labels at large sizes, signage | anything under 24 px (TY-24) |
 | **Ruqaa** | informal display, handwritten warmth | body, UI |
 | **Thuluth / Diwani** | ceremonial display, one word | anything that must be read quickly |
 | **Nastaliq** | Persian poetry and literary display | Arabic-language UI, body text |
@@ -36,9 +37,20 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | Classical Naskh | Amiri | book and literary feel, marks included |
 | Display | Reem Kufi, El Messiri, Lemonada, Qahiri, Kufam, Aref Ruqaa | display only |
 
+**Government design systems** set their own faces. Follow them when building for that entity, and scope their Latin tracking to `:lang(en)` (DGA's display tokens carry −2% tracking, Dubai's −1% to +2%, which is SC-01 on Arabic):
+
+| System | Arabic | Latin | Notes |
+|---|---|---|---|
+| Saudi DGA (design.dga.gov.sa, v4) | IBM Plex Sans Arabic | IBM Plex Sans | type scale in px (size/line): display 72/90, 60/72, 48/60, 36/44, 30/38, 24/32; text 20/30, 18/28, 16/24, 14/20, 12/18. The Saudi Font only for national occasions, only in main headings, never body text |
+| UAE federal (designsystem.gov.ae) | Noto Kufi Arabic (body), Alexandria (headings) | Roboto, Inter | 16 px base and minimum, ratio 1.2, body line height ≥ 1.5, measure 60–100 characters, never justified, at most 3 weights per pattern |
+| Dubai (designsystem.dubai.ae) | Dubai font | Dubai font | body 18/28 above 1440 px, 16/24 on desktop and tablet, 14/20 on phones, never under 14 px |
+
+Only a government entity's own site shows its stamp, banner or a «مسجّل لدى هيئة الحكومة الرقمية» line. Anywhere else it is impersonation (CP-07, `core/honesty.md`).
+
 **Commercial and regional families** (29LT, TypeTogether's Greta Arabic, Thmanyah's families, the Dubai font…): use them only with a licence that covers web embedding, and check the weights and the Latin partner.
 
 **Rules.**
+- **Semi-transparent Arabic shows its joins.** Where the strokes of joined letters overlap, alpha text draws the overlap darker. Use opaque colour tokens for Arabic text, or apply `opacity` to the whole element rather than an alpha colour to the glyphs (CO-17).
 - **Arabic appears smaller.** At the same `font-size`, many Arabic faces look 10 to 20% smaller than their Latin partner. Measure, then fix with `size-adjust` in the Arabic `@font-face`, or with a `:lang(ar)` size step. Never guess.
 - **Weights under 400 break down** at interface sizes, because the thin strokes disappear. Keep 400 to 700 for UI and body text.
 - **Display faces stay large.** Geometric Kufi display faces simplify or drop dots at small sizes: in Kufam, a final ن at 16px reads as ر. Use display faces at 24px and up, and set labels, buttons, navigation and prices in the UI or body face (TY-24).
@@ -59,6 +71,7 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | Body (UI) | 16 to 17px minimum | 1.6 |
 | Headings | scale ratio ≥ 1.25 | 1.25 to 1.4 |
 | Single-line controls | ≥ 16px | ≥ 1.5, or padding-driven height |
+| Anything Arabic | ≥ 14px computed | `size-adjust` does not raise the computed size, so it does not count (TY-13) |
 
 - Measure: 50 to 70 characters per line for reading.
 - Marks and descenders need space. Never clamp Arabic lines with `line-height: 1` or fixed control heights (SC-15).
@@ -81,7 +94,7 @@ Arabic type comes in styles with different jobs. Pick the style for the role, th
 | `text-align: justify` on UI text | rivers of space without kashida support | `start` |
 | generated images containing Arabic text | image models break letters (IG-08) | text in HTML or SVG |
 
-Put this reset at the base of every multilingual stylesheet:
+Put this reset in every multilingual stylesheet. **Mind the cascade:** `:lang(ar)` and `.eyebrow` have the same specificity, so a `.eyebrow { letter-spacing: .1em }` written after the reset wins and tracks the Arabic anyway. Put the reset last, raise it (`:lang(ar) .eyebrow`, or `:is(:lang(ar), :lang(fa)) *` in a final layer), or pair every `tracking-*` utility with `rtl:tracking-normal`. Check tracking in Safari too: WebKit and Chromium do not treat letter-spacing on Arabic the same way, so a Chromium screenshot can hide SC-01 (reported by rtl-skill; confirm on a real iPhone).
 
 ```css
 :is(:lang(ar), :lang(fa)) {
@@ -125,9 +138,16 @@ Put this reset at the base of every multilingual stylesheet:
   - mirror arrows, chevrons, back and forward, send, reply, undo and redo, and indent;
   - never mirror clocks, play, checkmarks, logos, or icons containing letters or digits.
 - **Tables:** in RTL, text columns align start (right). Numeric columns may align end for comparison; decide once.
-- **Charts:** decide whether time runs right to left (natural for Arabic readers) or left to right (convention in finance), then document it. Never reverse an axis without reversing its data. In Recharts: keep the chart in a `dir="ltr"` wrapper, then set `reversed` on the X axis and `orientation="right"` on the Y axis for right-to-left time, pass the Arabic `fontFamily` to the ticks explicitly, and put an RLM (U+200F) before mixed tick labels.
+- **Charts:** decide whether time runs right to left (natural for Arabic readers) or left to right (convention in finance), then document it. Never reverse an axis without reversing its data. In Recharts: keep the chart in a `dir="ltr"` wrapper, then set `reversed` on the X axis and `orientation="right"` on the Y axis for right-to-left time, pass the Arabic `fontFamily` to the ticks explicitly, and wrap mixed tick labels in an isolate (U+2068 … U+2069) rather than a bare RLM.
+- **The DOM order is the reading order** (SC-26). Never add `row-reverse`, `order` or `rtl:flex-row-reverse` "for RTL": `dir` already reversed the row. When you build from an RTL design file or screenshot, write the elements in reading order (right to left), not in the file's x-order.
+- **Off-canvas panels:** a drawer parked at `translateX(-100%)` or `left: -320px` sits inside the scroll area in RTL and adds horizontal scroll; `visibility` and `opacity` do not help. Hide it with `display: none` when closed, or park it with `inset-inline-start` and mirror the transform under `:dir(rtl)`. Use `overflow-x: clip` (not `hidden`) on the page, so sticky headers keep working.
+- **Centring is direction-neutral:** `left: 50%; translate: -50%` (or `left-1/2 -translate-x-1/2`) centres in both directions. Do not "fix" it to `inset-inline-start`, which breaks it.
+- **Form controls do not inherit fonts.** Without `button, input, select, textarea { font: inherit }`, Arabic inside them falls back to a system face (Tailwind's preflight already does this).
+- **Direction before the first paint.** `lang` and `dir` belong in the server HTML. Setting them in `useEffect` or `onMounted` flashes the page in the wrong direction, and `rtl:` variants miss the first render (SC-24).
+- **Chart libraries:** Chart.js: `scales.x.reverse: true`, `scales.y.position: 'right'`, `rtl: true` on the legend and tooltip. ECharts: `xAxis.inverse: true`, `yAxis.position: 'right'`. In SVG, set `direction` on each `<text>`, not on the root. Carousels: Embla `direction: 'rtl'`; Swiper needs a remount (a `key`) when the language changes.
+- **Native apps:** Flutter `EdgeInsetsDirectional` and `matchTextDirection: true` on directional images, with Material's `letterSpacing` set to 0 for Arabic; React Native `I18nManager.forceRTL` needs a reload; Android: the `RtlHardcoded` lint and `android:autoMirrored`; SwiftUI: `chevron.backward`, not `chevron.left`.
 - **Script follows direction too** (SC-22). Logical CSS does not reach JavaScript: `scrollLeft`, `ArrowLeft`/`ArrowRight` handlers, swipe deltas and `side="left"` props must branch on the direction. Radix and shadcn read direction from `DirectionProvider`, not from the DOM: wrap the app in it (shadcn: `npx shadcn init --rtl`, or `"rtl": true` in `components.json`). shadcn flips icons with `rtl:rotate-180`, which turns asymmetric icons upside down; use `rtl:-scale-x-100`.
-- **Tailwind v4** writes logical CSS for `ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`, `text-start`, `border-s-*`, `rounded-s-*`, and for `space-x-*`. Physical utilities (`ml-*`, `pl-*`, `left-*`, `text-left`, `bg-left`, `origin-left`, `bg-linear-to-r`) need an `rtl:` pair or the logical form. In Tailwind v3, `space-x-*` is physical and needs `rtl:space-x-reverse`.
+- **Tailwind v4** writes logical CSS for `ms-*`, `me-*`, `ps-*`, `pe-*`, `inset-s-*`, `inset-e-*` (`start-*` and `end-*` still work but are deprecated since 4.2), `text-start`, `border-s-*`, `rounded-s-*`, and for `space-x-*`. Physical utilities (`ml-*`, `pl-*`, `left-*`, `text-left`, `bg-left`, `origin-left`, `bg-linear-to-r`) need an `rtl:` pair or the logical form. In Tailwind v3, `space-x-*` is physical and needs `rtl:space-x-reverse`.
 - **Logical CSS that is safe now:** `float` and `clear: inline-start`, `inset-inline`, `border-start-start-radius`, `margin-inline`, `scroll-padding-inline`, `resize: inline`. **Not safe yet:** logical `background-position` (`x-start`), logical `caption-side`. Transforms, gradients (`to right`), masks and shadows have no logical form: write the RTL value under `:dir(rtl)`.
 
 ## 8. Forms
@@ -174,6 +194,11 @@ Put this reset at the base of every multilingual stylesheet:
   - «رحلة» for anything that is not a journey;
   - stacked «بالإضافة إلى ذلك / علاوة على ذلك»;
   - emoji bullets.
+- **Error and request openers:** errors start with what failed («تعذّر حفظ…», «فشل الإرسال…», «…غير متوفر حالياً»); requests start with «يرجى…». Tooltips use the masdar («عرض التفاصيل»), which avoids gender agreement.
+- **Loanwords:** Arabic first, then the abbreviation in brackets: «واجهة برمجة التطبيقات (API)». Never «الـAPI», «الإيميل» or Arabizi; write «البريد الإلكتروني». Names of Arab people and places in Arabic letters.
+- **No slash-doubled gender** («أدخل/ي», CP-20).
+- **No religious phrases** («إن شاء الله», «بإذن الله») in errors, deadlines or procedural messages: they promise nothing and read as a dodge.
+- **For screen readers:** Arabic without vowels can have several readings; add the تشكيل on a word a voice would misread (a name, a homograph). Spell out «&», «+» and «~». All-capital Latin strings are read letter by letter. Prefer «اختر» or «حدد» to «انقر»: not everyone clicks.
 - **Spelling:** check hamza (إنشاء not انشاء), taa marbuta and alif maqsura. A spelling error in a heading reads as carelessness, not as a machine, but it is fixed the same way.
 
 ## 10. The "Arabic" category reflex

@@ -13,10 +13,12 @@ Every paragraph has a base direction (from `dir`). Strong characters (letters) h
 | A known-LTR token inside RTL text (a product name, email, URL, code) | `<span dir="ltr">iPhone 17 Pro</span>` (the `dir` attribute isolates) |
 | User content of unknown direction | `<bdi>{name}</bdi>`, or `dir="auto"` on the element |
 | An inline span that must keep its own direction | `unicode-bidi: isolate` (implied by `dir` on the element) |
-| A plain string with no markup possible (a `<title>`, a push notification) | U+2068 FSI … U+2069 PDI around the token, or an LRM (U+200E) / RLM (U+200F) mark next to the neutral |
+| A plain string with no markup possible (a `<title>`, an `aria-label`, a `placeholder`, an `<option>`, a toast, a push notification) | U+2068 FSI (or U+2066 LRI) … U+2069 PDI around the token. Prefer isolates to bare LRM/RLM marks: marks leak into copied text and fix only one neutral at a time |
 
-- Put `dir="ltr"` on **inline** elements. On a block, it also flips the alignment.
-- `Intl` output for Arabic locales already includes an RLM where needed. Do not wrap it in `dir="ltr"`: the wrapper fights the formatter.
+- Put `dir="ltr"` on **inline** elements for short runs. On a block it also flips the alignment, which is right for a whole English paragraph of three lines or more (it should align to its own language) and wrong for a one-line label inside an Arabic layout. All items of one list share one alignment.
+- `Intl` output for Arabic locales already includes the marks it needs. Never wrap a formatted Arabic amount or date in `dir="ltr"` or `<bdi dir="ltr">`: the wrapper fights the formatter.
+- **Latin-only labels inside RTL** lose their punctuation to the wrong side: `Gregorian:` renders as `:Gregorian`, and `1,234.50 (AED)` as `(AED) 1,234.50`. Wrap the label with its colon, or the amount with its unit, in `<bdi>`.
+- **`dir="auto"` looks only at the first strong letter.** An Arabic message that starts with "WhatsApp" or "npm" is laid out LTR. For chat, comments and AI output, use `unicode-bidi: plaintext` on the paragraph (each paragraph finds its own direction), or decide from the majority of letters, or set `dir` from the known language.
 
 ## Inputs
 
@@ -38,11 +40,13 @@ Every paragraph has a base direction (from `dir`). Strong characters (letters) h
 
 **Do not mirror:**
 - photographs, logos and brand marks;
-- media controls (play and pause, the timeline in some conventions: decide and document);
-- clocks, checkmarks;
+- media controls: play, pause, skip and the playback progress bar always run left to right;
+- circular-time icons (clock, refresh, history), the search magnifier, the slash in "off" icons, keyboards, checkmarks, and a pen, which keeps its angle;
 - icons containing letters or digits;
 - keyboard shortcut glyphs;
 - maps.
+
+**Reverse in RTL:** numbered scales and steppers (a 1–5 rating, an NPS 0–10 row, pagination dots, a lowest-to-highest scale) start at the right. The digits inside each number never reverse.
 
 ## Numbers inside RTL
 

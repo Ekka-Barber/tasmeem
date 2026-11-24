@@ -1,6 +1,6 @@
 # The tells catalog
 
-A *tell* is a visible habit that makes an interface read as generated rather than designed. The catalog merges the tells that twelve independent sources agree on, and adds a family none of them covers: tells that come from ignoring the writing system (`SC-`).
+A *tell* is a visible habit that makes an interface read as generated rather than designed. The catalog merges the tells that independent design skills, guides and government design systems agree on, and adds a family none of them covers: tells that come from ignoring the writing system (`SC-`).
 
 Read only the category files you need:
 
@@ -55,6 +55,9 @@ What it looks like, in one or two sentences.
 - `UI`: ibelick ui-skills
 - `AF`: designing-arabic-frontends
 - `VS`: visant-skills
+- `DK`: dualkit · `RT`: rtl-skill (two repositories) · `AC`: Arabic copy repositories (arabic-copywriting, arabic-ui, Sibawayh)
+- `DGA`: Saudi DGA design system · `UAE-C` / `UAE-T`: UAE design system, content and typography · `MS`: Microsoft Arabic style guide
+- `USWDS`: U.S. Web Design System · `GSC`: Google Search Central · `UX-AR`: Content style guide in Arabic
 - `T`: tasmeem's own addition
 
 ## Brand exceptions
